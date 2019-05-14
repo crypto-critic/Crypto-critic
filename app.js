@@ -27,6 +27,7 @@ mongoose.connect(dbString, { useNewUrlParser: true }, function(){
     require('@scripts/insert').coin();
     require('@scripts/insert').chart();
     require('@scripts/coin/sync')();
+    require('@scripts/chart/chart_draw');
 });
 //SERVER-------------------------------------------
 var server = app.listen(process.env.PORT || 3000, function () {
