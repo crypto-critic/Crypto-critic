@@ -10,6 +10,7 @@ var get_data = (id) => new Promise((res, rej)=>{
     coingecko.get_coin(id).then(data => {
       if (data == null){
         console.log('Coinlib setup')
+          console.log('CMC setup')
       } else {res(data)}
     })
 })
