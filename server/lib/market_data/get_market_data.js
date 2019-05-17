@@ -9,7 +9,7 @@ var coingeckourl = 'https://api.coingecko.com/api/v3/coins/bitcoin';
 var get_data = (id) => new Promise((res, rej)=>{
     coingecko.get_coin(id).then(data => {
       if (data == null){
-        console.log('thuc hien coinlib')
+        console.log('Coinlib setup')
       } else {res(data)}
     })
 })
