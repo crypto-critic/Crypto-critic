@@ -1,0 +1,18 @@
+.ReactTable .rt-tbody .rt-td .right {
+    text-align: right;
+    border-right: 0px !important;
+}
+.ReactTable .rt-tbody .rt-td .left{
+    text-align: right !important;
+    border-right: 0px !important;
+}
+.ReactTable .rt-thead .rt-tr .right{
+    text-align: left !important;
+    color: #404141;
+}
+.ReactTable .rt-thead .rt-tr .left{
+    text-align: left;
+}
+.ReactTable {
+    border: 0px !important;
+}
