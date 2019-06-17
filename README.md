@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="https://api.cryptocritic.live">
-    Crypto Critic platform
+    Crypto Critic platform - Encyclopedia of masternodes
   </a>
 </h1>
 
