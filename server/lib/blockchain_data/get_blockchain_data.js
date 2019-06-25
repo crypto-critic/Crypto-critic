@@ -1,63 +1,44 @@
+require('babel-polyfill')
 require('module-alias/register');
 var coin_array = require('@init/coin_array');
 var getlink = require('@lib/blockchain_data/get_blockchain_links');
 var axios = require('axios');
 
-var getmasternodecount = (link) => new Promise((res,rej)=>{
-    axios.get(link)
-    .then((data)=>{
-        res(data.data.total)
-    })
-    .catch((err)=>rej(err))
-    ;
-})
-var getmoneysupply = (link) => new Promise((res,rej)=>{
-    axios.get(link)
-    .then((data)=>{
-        res(data.data)
-    })
-    .catch((err)=>rej(err))
-    ;
-})
-var getdifficulty = (link) => new Promise((res,rej)=>{
-    axios.get(link)
-    .then((data)=>{
-        res(data.data)
-    })
-    .catch((err)=>rej(err))
-    ;
-})
-var getconnectioncount = (link) => new Promise((res,rej)=>{
-    axios.get(link)
-    .then((data)=>{
-        res(data.data)
-    })
-    .catch((err)=>rej(err))
-    ;
-})
-var getblockcount = (link) => new Promise((res,rej)=>{
-    axios.get(link)
-    .then((data)=>{
-        res(data.data)
-    })
-    .catch((err)=>rej(err))
-    ;
-})
-var getblocktime = () => new Promise((res,rej)=>{
-    res(1)
-})
-var getblockreward = () => new Promise((res,rej)=>{
-    res(10)
-})
-var gettotalsupply = () => new Promise((res,rej)=>{
-    res(1000000)
-})
-var getcurrentcollateral = () => new Promise((res,rej)=>{
-    res(1000)
-})
-var getcurrentratio = () => new Promise((res,rej)=>{
-    res(0.8)
-})
+var getmasternodecount = async (link) => {
+    var data = await axios.get(link);
+    return data.data.total;
+}
+var getmoneysupply = async (link) => {
+    var data = await axios.get(link);
+    return data.data;
+}
+var getdifficulty = async (link) => {
+    var data = await axios.get(link);
+    return data.data;
+}
+var getconnectioncount = async (link) => {
+    var data = await axios.get(link);
+    return data.data;
+}
+var getblockcount = async (link) => {
+    var data = await axios.get(link);
+    return data.data;
+}
+var getblocktime = async () => {
+    return 1;
+}
+var getblockreward = async () => {
+    return 10;
+}
+var gettotalsupply = async () => {
+    return 1000000;
+}
+var getcurrentcollateral = async () => {
+    return 1000;
+}
+var getcurrentratio = async () => {
+    return 0.8;
+}
 var get_data = (coin) => new Promise((res, rej) =>{
     getlink(coin).then(coin =>{
         Promise.all([
