@@ -5,20 +5,20 @@ const run = require('gulp-run');
 const webpack = require('webpack');
 const gutil    = require('gulp-util');
 const notifier = require('node-notifier');
-let devconfig = require('./config/webpack.config.dev');
-let statsLog      = { // для красивых логов в консоли
+let devconfig = require('./webpack.config.dev.js');
+let statsLog      = {
     colors: true,
     reasons: true
   };
 const startServer = () => {
     nodemon({
-        script: './app.js',
+        script: './dist/server.js',
         ext: 'js',
         "ignore": [
             ".idea/",
             ".git/",
             "gulpfile.js",
-            "src/",
+            "client/",
             "dist/assets",
             "node_modules/"
         ],
@@ -26,47 +26,32 @@ const startServer = () => {
     });
 };
 gulp.task('dev', (done) => {
-    // run webpack
     webpack(devconfig, onComplete);
     function onComplete(error, stats) {
-      if (error) { // кажется еще не сталкивался с этой ошибкой
+      if (error) {
         onError(error);
-      } else if ( stats.hasErrors() ) { // ошибки в самой сборке, к примеру "не удалось найти модуль по заданному пути"
+      } else if ( stats.hasErrors() ) {
         onError( stats.toString(statsLog) );
       } else {
         onSuccess( stats.toString(statsLog));
       }
     }
-  
     function onError(error) {
       let formatedError = new gutil.PluginError('webpack', error);
-  
-      notifier.notify({ // чисто чтобы сразу узнать об ошибке
+
+      notifier.notify({
         title: `Error: ${formatedError.plugin}`,
         message: formatedError.message
       });
-  
+
       done(formatedError);
     }
-  
     function onSuccess(detailInfo) {
       gutil.log('[webpack]', detailInfo);
       done();
     }
     startServer();
   });
-
-// gulp.task("dev", () => {
-    // startServer();
-    // start.do();
-//     var devEnv = Object.create(process.env);
-//     devEnv.NODE_ENV = 'developement';  
-//     if (!/^win/.test(process.platform)) { // linux
-//         spawn("webpack", ["--config config/webpack.config.dev.js"], {stdio: "inherit"});
-//     } else {
-//         spawn('cmd', ['/s', "/c", "webpack", "--config config/webpack.config.dev.js"], {env: devEnv}, {stdio: "inherit"});
-//     }
-// });
 
 let packageAssets = function() {
     gulp.src(["./dist/**","!./dist/assets/js/**", "!./dist/uploads/**"])
@@ -100,5 +85,5 @@ gulp.task("stop-db", ()=>{
     //         })
     //     })
     // })
-})
+});
 
