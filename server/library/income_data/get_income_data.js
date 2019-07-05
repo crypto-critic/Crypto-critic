@@ -1,13 +1,12 @@
-require('module-alias/register');
-var market = require('@lib/market_data/get_market_data');
-var blockchain = require('@lib/blockchain_data/get_blockchain_data');
+var market = require('../market_data/get_market_data');
+var blockchain = require('../blockchain_data/get_blockchain_data');
 var fx = (k) => new Promise((res, rej) => {
     res( {
         roi: 24*60/k.block_time_in_minuntes*k.block_reward*k.current_ratio/k.current_mn/k.current_collateral*36500,
         coin: 24*60/k.block_time_in_minuntes*k.block_reward*k.current_ratio/k.current_mn,
         collateral: k.current_collateral
     })
-})
+});
 var income = (income, price) => new Promise((res, rej) =>{
     res({
         coin: income,

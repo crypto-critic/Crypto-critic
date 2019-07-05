@@ -1,7 +1,6 @@
-require('module-alias/register');
-var blockchain_chart = require('@models/chart/blockchain_chart');
-var market_chart = require('@models/chart/market_chart');
-var income_chart = require('@models/chart/income_chart');
+var blockchain_chart = require('../models/chart/blockchain_chart');
+var market_chart = require('../models/chart/market_chart');
+var income_chart = require('../models/chart/income_chart');
 
 module.exports = (router)=>{
     router.get('/coins/chart/:id', (req, res)=>{

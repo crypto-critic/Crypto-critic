@@ -1,31 +1,23 @@
-require('module-alias/register');
-var coinmodel = require('@models/coin/coin');
+var coinmodel = require('../models/coin/coin');
+var listmodel = require('../models/listcoin');
 
 module.exports = (router)=>{
     //Get list of all coin
     router.get('/coins/list', (req, res)=>{
-        coinmodel.find({},(err, data)=>{
+        listmodel.find({},(err, data)=>{
             if(data){
-                res.status(200).json(data.map(i=>{
-                    return {
-                        id: i.id,
-                        name: i.name,
-                        active: i.active,
-                        category: i.category
-                    }
-                }))
+                res.status(200).json(data)
             }
         })
-    })
+    });
+
     //Get market infomation of coin (home table render)
     router.get('/coins/markets', (req, res)=>{
         var id = req.query.id;
         var category = req.query.category;
         var vs_currency = req.query.vs_currency;
-        // var spark_line = req.query.spark_line;
-        // var order = req.query.order
         if (!vs_currency || !category){
-            res.status(404).send('error: Require vs_currency and category')
+            res.status(404).json({message: 'error: Require vs_currency and category'})
         } else {
             if (!id) {
                 coinmodel.find({category: category},(err, data)=>{
@@ -91,7 +83,7 @@ module.exports = (router)=>{
                 })
             }
         }
-    })
+    });
     // router.get('/coins/blockchain', (req, res)=>{
     //     var id = req.query.id;
     //     var category = req.query.category;
@@ -134,5 +126,4 @@ module.exports = (router)=>{
             }
         })    
     })
-    //Get specifical coin ticker
-}
+};

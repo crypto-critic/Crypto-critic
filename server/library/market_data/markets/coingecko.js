@@ -1,6 +1,4 @@
-require('module-alias/register');
 var axios = require('axios');
-var api = require('@root/security/api')
 module.exports = {
     get_coin: async (coingecko_id) => {
         var base_url = 'https://api.coingecko.com/api/v3/coins/';
@@ -48,6 +46,3 @@ module.exports = {
         }
     }
 };
-// module.exports.get_coin('bitcoin').then(res=>{
-//     console.log(res);
-// });

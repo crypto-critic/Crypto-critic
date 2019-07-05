@@ -1,5 +1,4 @@
-require('module-alias/register');
-var coinmodel = require('@models/coin/coin');
+var coinmodel = require('../../models/coin/coin');
 module.exports = {
     check_coin: (coin)=> new Promise((res,rej)=>{
         coinmodel.findOne({id: coin}, function(err, stats){

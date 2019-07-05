@@ -1,8 +1,10 @@
-
-require('module-alias/register');
-var coin_db = require('@lib/database/coin_db');
-var chart_db = require('@lib/database/chart_db')
-var coin_array = require('@init/coin_array');
+var mongoose = require('mongoose');
+var dbString = 'mongodb://localhost:27017/myapp';
+mongoose.connect(dbString, { useNewUrlParser: true });
+var mongoose = require('mongoose');
+var coin_db = require('../library/database/coin_db');
+var chart_db = require('../library/database/chart_db')
+var coin_array = require('../initial/coin_array');
 var coin = ()=>{
     Promise.all(coin_array.map(o=>{
         coin_db.check_coin(o.id).then(a=>{
@@ -12,7 +14,7 @@ var coin = ()=>{
             }
         });
     }))
-}
+};
 var chart = ()=>{
     Promise.all(coin_array.map(o => {
         Promise.all([
@@ -36,16 +38,6 @@ var chart = ()=>{
             })
         ])
     }))
-}
-module.exports = {
-    coin: ()=>{
-        setInterval(()=>{
-            coin()
-        }, 10000)
-    },
-    chart: ()=>{
-        setInterval(()=>{
-            chart();
-        }, 10000)
-    },
-}
+};
+coin();
+chart();

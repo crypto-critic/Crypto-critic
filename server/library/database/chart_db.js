@@ -1,8 +1,6 @@
-require('module-alias/register');
-var mongoose = require('mongoose');
-var market_chart = require('@models/chart/market_chart');
-var blockchain_chart = require('@models/chart/blockchain_chart');
-var income_chart = require('@models/chart/income_chart');
+var market_chart = require('../../models/chart/market_chart');
+var blockchain_chart = require('../../models/chart/blockchain_chart');
+var income_chart = require('../../models/chart/income_chart');
 var moment = require('moment');
 
 module.exports = {

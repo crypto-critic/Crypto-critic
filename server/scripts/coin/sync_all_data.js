@@ -1,8 +1,7 @@
-require('module-alias/register');
-var coin_db = require('@lib/database/coin_db');
-var market = require('@lib/market_data/get_market_data');
-var blockchain = require('@lib/blockchain_data/get_blockchain_data');
-var income = require('@lib/income_data/get_income_data');
+var coin_db = require('../../library/database/coin_db');
+var market = require('../../library/market_data/get_market_data');
+var blockchain = require('../../library/blockchain_data/get_blockchain_data');
+var income = require('../../library/income_data/get_income_data');
 var sync_all_data = (coin) => new Promise((res, rej) => {
     income.get_all_data(coin).then(data => {
         Promise.all([
@@ -24,5 +23,5 @@ var sync_all_data = (coin) => new Promise((res, rej) => {
     //         })
     //     })
     // })
-})
+});
 module.exports = sync_all_data;
