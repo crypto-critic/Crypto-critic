@@ -4,7 +4,7 @@ const User = require('./models/user');
 const opts = {};
 
 opts.jwtFromRequest = ExtractJWT.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = 'secret';
+opts.secretOrKey = 'pinokarahere';
 
 module.exports = passport => {
     passport.use(new JWTStrategy(opts, (jwt_payload, done) => {

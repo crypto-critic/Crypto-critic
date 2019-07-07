@@ -16,6 +16,7 @@
     ["@babel/transform-runtime"],
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-export-default-from",
+    "@babel/plugin-syntax-dynamic-import",
     ["lodash", {"id": ["lodash", "semantic-ui-react"]}]
   ],
   "env": {

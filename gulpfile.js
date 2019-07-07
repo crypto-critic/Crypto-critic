@@ -5,7 +5,7 @@ const run = require('gulp-run');
 const webpack = require('webpack');
 const gutil    = require('gulp-util');
 const notifier = require('node-notifier');
-let devconfig = require('./webpack.config.dev.js');
+let devconfig = require('./config/webpack.config.dev.js');
 let statsLog      = {
     colors: true,
     reasons: true

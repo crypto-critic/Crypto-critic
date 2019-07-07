@@ -73,11 +73,10 @@ module.exports = (router)=>{
                     .then(isMatch => {
                         if(isMatch) {
                             const payload = {
-                                id: user.id,
-                                name: user.name,
-                                avatar: user.avatar
-                            }
-                            jwt.sign(payload, 'secret', {
+                                email: user.email,
+                                name: user.name
+                            };
+                            jwt.sign(payload, 'pinokarahere', {
                                 expiresIn: 3600
                             }, (err, token) => {
                                 if(err) console.error('There is some error in token', err);
