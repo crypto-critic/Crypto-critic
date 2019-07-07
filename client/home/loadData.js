@@ -6,7 +6,7 @@ var loadData = () => new Promise((res, rej)=>{
     // console.log(a);
     res(a.data.map(item => {
       return {
-        id :  item.id,
+                id :  item.id,
                 name :  item.basedata.name,
                 price: {
                   BTC : item.marketdata.price.BTC,

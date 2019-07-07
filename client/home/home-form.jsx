@@ -3,10 +3,8 @@ import ReactTable from "react-table/lib";
 import 'react-table/react-table.css';
 import { Link, Route } from "react-router-dom";
 import axios from 'axios';
-import 'styling/semantic.less';
-import { Button, Icon, Label , Grid, Popup, Flag} from 'semantic-ui-react'
 import loadData from './loadData2';
-import {AppLayout} from '../components/app-layout/app-layout';
+import {AppLayout} from '../components/AppLayout/app-layout';
 import './table-style.css';
 const chooseCoin = (base, x) => {
   return (
@@ -97,7 +95,6 @@ const HomeForm = ({data, base}) => (
                       className: 'left',
                       Header: "Coin",
                       accessor: "",
-                      className: 'coin',
                       Cell: row => (
                         <span>
                           <span style={{
