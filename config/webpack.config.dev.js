@@ -24,10 +24,10 @@ module.exports = {
                 loader: require.resolve('babel-loader'),
                 exclude: appNodeModules
             },
-            {
-                test: /\.css$/,
-                use: [ 'style-loader', 'css-loader' ]
-            },
+            // {
+            //     test: /\.css$/,
+            //     use: [ 'style-loader', 'css-loader' ]
+            // },
             {
                 test: /\.(png|svg|jpg|gif|ico|jpeg)$/i,
                 use: [
@@ -53,7 +53,7 @@ module.exports = {
                 use: [
                     'style-loader',
                     'css-loader',
-                    'postcss-loader',
+                    // 'postcss-loader',
                     {
                         loader: 'less-loader',
                         options: {
