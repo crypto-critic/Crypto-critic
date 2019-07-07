@@ -1,0 +1,81 @@
+.home-index {
+    float:left;
+    width:220px;
+    height:100px;
+    border-radius:8px;
+    background-color:#fff;
+    -webkit-box-shadow:0 2px 20px 0 rgba(0,0,0,.05);
+    box-shadow:0 2px 20px 0 rgba(0,0,0,.05);
+    margin-right:20px;
+    position:relative;
+    cursor:pointer
+}
+.home-index .index-bg-red {
+    background-color: #ee6560;
+}
+.home-index .index-bg-green {
+    background-color: #4db872;
+}
+.home-index:hover {
+    -webkit-box-shadow:0 15px 30px rgba(0,0,0,.1);
+    box-shadow:0 15px 30px rgba(0,0,0,.1);
+    -webkit-transform:translateY(-5px);
+    -ms-transform:translateY(-5px);
+    transform:translateY(-5px);
+    -webkit-transition:all .2s linear;
+    -o-transition:all .2s linear;
+    transition:all .2s linear
+}
+.home-index:nth-of-type(5n) {
+    margin-right:0
+}
+.home-index .home-index-percent,
+.home-index .home-index-price,
+.home-index .home-index-title {
+    margin-left:16px
+}
+.home-index .home-index-title {
+    height:24px;
+    opacity:.9;
+    font-size:16px;
+    font-weight:500;
+    line-height:1.5;
+    margin:8px 0 0 16px;
+    color:rgba(0,0,0,.85)
+}
+.home-index .home-index-price {
+    height:36px;
+    font-size:24px;
+    font-weight:500;
+    line-height:1.5;
+    text-align:left;
+    z-index:1;
+    position:relative
+}
+.home-index .home-index-percent {
+    font-size:12px;
+    font-weight:500;
+    line-height:18px;
+    height:18px;
+    text-align:center;
+    color:#fff;
+    width:58px;
+    border-radius:4px;
+    min-width:58px;
+    margin-top:4px;
+    position:relative;
+    z-index:1
+}
+.home-index .line,
+.home-index .peity {
+    position:absolute;
+    bottom:0;
+    z-index:0;
+    display:block
+}
+.home-index .index-img {
+    width: 26px;
+    height: 26px;
+    vertical-align: center;
+    margin-left: 8px;
+}
