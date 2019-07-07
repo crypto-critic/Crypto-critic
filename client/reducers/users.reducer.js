@@ -40,7 +40,6 @@ export function users(state = {}, action) {
             // return copy of user with 'deleteError:[error]' property
             return { ...userCopy, deleteError: action.error };
           }
-
           return user;
         })
       };
