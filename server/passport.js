@@ -8,7 +8,7 @@ opts.secretOrKey = 'pinokarahere';
 
 module.exports = passport => {
     passport.use(new JWTStrategy(opts, (jwt_payload, done) => {
-        User.findById(jwt_payload.id)
+        User.findOne({email: jwt_payload.email})
             .then(user => {
                 if(user) {
                     return done(null, user);
@@ -17,4 +17,4 @@ module.exports = passport => {
             })
             .catch(err => console.error(err));
     }));
-}
+};
