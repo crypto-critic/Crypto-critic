@@ -21,7 +21,7 @@ const columns = [
         id: 'coin',
         width: 200,
         accessor: data => ({id: data.id, name: data.name}),
-        Cell: (data) => <div style={{margin: 2px, auto;}}><img className='img' src={`assets/img/coin/${data.value.id}.png`}/>{data.value.name}</div>,
+        Cell: (data) => <div><img className='img' src={`assets/img/coin/${data.value.id}.png`}/>{data.value.name}</div>,
         className: 'cell left'
     },
     {
