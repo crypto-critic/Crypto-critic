@@ -2,6 +2,7 @@ var axios = require('axios');
 module.exports = {
     get_coin: async (coingecko_id) => {
         var base_url = 'https://api.coingecko.com/api/v3/coins/';
+        var sparkline = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=7d'
         let res = await axios.get(base_url+coingecko_id);
         if (res){
             let data = res.data;

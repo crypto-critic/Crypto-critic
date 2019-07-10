@@ -1,12 +1,12 @@
 .home-index {
     float:left;
-    width:220px;
-    height:100px;
+    width:320px;
+    height:140px;
     border-radius:8px;
     background-color:#fff;
     -webkit-box-shadow:0 2px 20px 0 rgba(0,0,0,.05);
     box-shadow:0 2px 20px 0 rgba(0,0,0,.05);
-    margin-right:20px;
+    margin-right:40px;
     position:relative;
     cursor:pointer
 }
@@ -40,7 +40,7 @@
     font-size:16px;
     font-weight:500;
     line-height:1.5;
-    margin:8px 0 0 16px;
+    margin:12px 0 0 16px;
     color:rgba(0,0,0,.85)
 }
 .home-index .home-index-price {
@@ -74,8 +74,9 @@
     display:block
 }
 .home-index .index-img {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     vertical-align: center;
-    margin-left: 8px;
+    margin-top: 5px;
+    margin-right: 8px;
 }
