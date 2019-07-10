@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ListSchema = new Schema({
-    id: { type: String, unique: true, index: true },
+    coinId: { type: String, unique: true, index: true },
     name: { type: String},
     active: { type: Boolean, default: true },
     category: { type: String}
