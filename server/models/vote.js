@@ -2,8 +2,16 @@ var mongoose = require('mongoose')
   , Schema = mongoose.Schema;
  
 var VoteSchema = new Schema({
-  ip: String,
+  userId: {
+    type: String,
+    required: true,
+    ref: 'users'
+  },
   vote: Boolean,
-  coin_id: String,
+  coinId: {
+    type: String,
+    required: true,
+    ref: 'list'
+  },
 });
-module.exports = mongoose.model('vote', VoteSchema);
+module.exports = mongoose.model('votes', VoteSchema);
