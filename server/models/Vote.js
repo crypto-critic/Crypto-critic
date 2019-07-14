@@ -5,13 +5,13 @@ var VoteSchema = new Schema({
   userId: {
     type: String,
     required: true,
-    ref: 'users'
+    ref: 'User'
   },
   vote: Boolean,
   coinId: {
     type: String,
     required: true,
-    ref: 'list'
+    ref: 'List'
   },
 });
-module.exports = mongoose.model('votes', VoteSchema);
+module.exports = mongoose.model('Vote', VoteSchema);

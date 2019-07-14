@@ -9,6 +9,6 @@ const ListSchema = new Schema({
     category: { type: String}
 });
 
-const List = mongoose.model('lists', ListSchema);
+const List = mongoose.model('List', ListSchema);
 
 module.exports = List;

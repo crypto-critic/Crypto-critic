@@ -1,51 +1,50 @@
 require('babel-polyfill');
-var coin_array = require('../../initial/coin_array');
-var axios = require('axios');
+const axios = require('axios');
 
-var getmasternodecount = async (link) => {
-    var data = await axios.get(link);
+const getmasternodecount = async (link) => {
+    let data = await axios.get(link);
     return data.data.total;
 };
-var getcurrentsupply = async (link) => {
-    var data = await axios.get(link);
+const getcurrentsupply = async (link) => {
+    let data = await axios.get(link);
     return data.data.t;
 };
-var getdifficulty = async (link) => {
-    var data = await axios.get(link);
+const getdifficulty = async (link) => {
+    let data = await axios.get(link);
     return data.data;
 };
-var getconnectioncount = async (link) => {
-    var data = await axios.get(link);
+const getconnectioncount = async (link) => {
+    let data = await axios.get(link);
     return data.data;
 };
-var getblockcount = async (link) => {
-    var data = await axios.get(link);
+const getblockcount = async (link) => {
+    let data = await axios.get(link);
     return data.data;
 };
-var getblocktime = async (link) => {
-    var data = await axios.get(link);
+const getblocktime = async (link) => {
+    let data = await axios.get(link);
     return data.data.blocktime/60;
 };
-var getblockreward = async (link) => {
-    var data = await axios.get(link);
+const getblockreward = async (link) => {
+    let data = await axios.get(link);
     return data.data.blockreward;
 };
-var gettotalsupply = async (link) => {
-    var data = await axios.get(link);
+const gettotalsupply = async (link) => {
+    let data = await axios.get(link);
     return data.data.totalsupply;
 };
-var getcurrentcollateral = async (link) => {
-    var data = await axios.get(link);
+const getcurrentcollateral = async (link) => {
+    let data = await axios.get(link);
     return data.data.collateral;
 };
-var getcurrentratio = async (link) => {
-    var data = await axios.get(link);
+const getcurrentratio = async (link) => {
+    let data = await axios.get(link);
     return data.data.mnratio;
 };
-var getBlockchainData = async (coin) => {
-    var host = require(`./server/initial`).host;
-    // console.log(host);
-    var result =  {
+const getBlockchainData = async (coin) => {
+    let host = await require(`../../initial/coin/${coin}.js`).host;
+    console.log(host);
+    let result =  {
         current_block: await getblockcount(host + 'getblockcount'),
         block_time_in_minuntes: await getblocktime(host + 'chainblocktime'),
         block_reward: await getblockreward(host + 'chainblockreward'),

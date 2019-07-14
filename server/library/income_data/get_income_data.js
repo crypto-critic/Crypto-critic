@@ -65,7 +65,7 @@ var income = (income, price) => new Promise((res, rej) =>{
         xrp: income*price.xrp,
         zar: income*price.zar,
     })
-})
+});
 var get_data = (k, market) => new Promise((res, rej) =>{
     fx(k).then(result => {
         Promise.all([
@@ -89,7 +89,7 @@ var get_data = (k, market) => new Promise((res, rej) =>{
             masternode_worth: masternode_worth
         })}) 
     })
-})
+});
 var get_all_data = (coin) => new Promise((res, rej) => {
     Promise.all([
         market.get_data(coin),
@@ -103,7 +103,7 @@ var get_all_data = (coin) => new Promise((res, rej) => {
             })
         })
     })
-})
+});
 module.exports = {
     get_income_data: get_data,
     get_all_data: get_all_data

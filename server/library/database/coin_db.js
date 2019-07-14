@@ -1,7 +1,9 @@
-var coinmodel = require('../../models/coin/coin');
+const coinmodel = require('../../models/coin/Coin');
+const List = require('../../models/ListCoin');
+
 module.exports = {
     check_coin: (coin)=> new Promise((res,rej)=>{
-        coinmodel.findOne({id: coin}, function(err, stats){
+        List.findOne({coinId: coin}, function(err, stats){
             if(stats) {
                 res (true);
               } else {
@@ -11,7 +13,7 @@ module.exports = {
     }),
     create_coin: (coin) => new Promise((res,rej)=>{
         var newCoin = new coinmodel({
-            id: coin,
+            coinId: coin,
         });
         newCoin.save(function(err){
             if (!err) {
@@ -23,7 +25,7 @@ module.exports = {
     }),
     update_basedata: (id, k) => new Promise((res,rej)=>{
         coinmodel.update(
-            {id: id},
+            {coinId: id},
             {$set: {
                 name: k.name,
                 localization:  k.localization,
@@ -38,7 +40,7 @@ module.exports = {
     }),
     get_coin: (coin) => new Promise((res, rej)=>{
         coinmodel.findOne(
-            {id: coin}, (err, res)=>{
+            {coinId: coin}, (err, res)=>{
                 if (err) {
                     rej (err)
                 } else {
@@ -49,7 +51,7 @@ module.exports = {
     }),
     update_market: (id, k) => new Promise((res, rej) => {
         coinmodel.update(
-            {id: id},
+            {coinId: id},
             {$set: {
                 market_data: k.market_data,
                 community_data: k.community_data,
@@ -61,7 +63,7 @@ module.exports = {
     }),
     update_income: (id, income) => new Promise((res, rej) =>{
         coinmodel.update(
-            {id: id},
+            {coinId: id},
             {$set: {
                 income_data: income,
                 }
@@ -70,7 +72,7 @@ module.exports = {
     }),
     update_blockchain: (id, blockchain) => new Promise((res, rej) => {
         coinmodel.update(
-            {id: id},
+            {coinId: id},
             {$set: {
                 blockchain_data: blockchain
                 }   

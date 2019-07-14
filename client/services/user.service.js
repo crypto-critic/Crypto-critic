@@ -28,7 +28,7 @@ function login(email, password) {
 }
 
 function logout() {
-    localStorage.removeItem('user');
+    localStorage.removeItem('User.js');
 }
 
 function getAll() {

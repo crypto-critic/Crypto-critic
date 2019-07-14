@@ -6,7 +6,8 @@ var income_data_style = require('./income_data_style');
 var market_data_style = require('./market_data_style');
 var blockchain_data_style = require('./blockchain_data_style');
 var CoinSchema = new Schema({
-  id: { type: String, unique: true, index: true },
+  _id: { type: Schema.Types.ObjectId, unique: true},
+  coinId: { type: String, unique: true, index: true },
   name: { type: String, default: '' },
   localization:  locale,
   category: { type: String, default: ''},
@@ -48,6 +49,6 @@ var CoinSchema = new Schema({
     commit_count_4_weeks: { type: Number, default: 0 },
   },
   last_updated: Date
-}, {id: false});
+});
 
-module.exports = mongoose.model('coin', CoinSchema);
+module.exports = mongoose.model('Coin', CoinSchema);

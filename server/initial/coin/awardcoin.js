@@ -1,7 +1,7 @@
 module.exports = {
     base: {
         id: "awardcoin",
-        name: "award",
+        name: "Award Coin",
         symbol: 'awr',
         category: 'masternode',
         active: true,

@@ -25,4 +25,4 @@ var ShareSchema = new Schema({
     withdraw: { type: String, default: '' }
   }]
 });
-module.exports = mongoose.model('share', ShareSchema);
+module.exports = mongoose.model('Share', ShareSchema);

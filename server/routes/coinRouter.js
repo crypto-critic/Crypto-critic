@@ -1,10 +1,10 @@
-var coinmodel = require('../models/coin/coin');
-var listmodel = require('../models/listcoin');
+const coinmodel = require('../models/coin/Coin');
+const ListCoin = require('../models/ListCoin');
 
 module.exports = (router)=>{
     //Get list of all coin
-    router.get('/coins/list', (req, res)=>{
-        listmodel.find({},(err, data)=>{
+    router.get('/coins/list', (req, res) => {
+        ListCoin.find({},(err, data)=>{
             if(data){
                 res.status(200).json(data)
             }
@@ -13,9 +13,9 @@ module.exports = (router)=>{
 
     //Get market infomation of coin (home table render)
     router.get('/coins/markets', (req, res)=>{
-        var id = req.query.id;
-        var category = req.query.category;
-        var vs_currency = req.query.vs_currency;
+        let id = req.query.id;
+        let category = req.query.category;
+        let vs_currency = req.query.vs_currency;
         if (!vs_currency || !category){
             res.status(404).json({message: 'error: Require vs_currency and category'})
         } else {
@@ -42,7 +42,7 @@ module.exports = (router)=>{
         }
     });
     router.get('/coins/:coin', (req, res)=>{
-        var coin = req.params.coin;
+        let coin = req.params.coin;
         coinmodel.findOne({id: coin}, (err, i)=>{
             if (i==null){
                 res.status(404).send('error: Could not find coin with given id')

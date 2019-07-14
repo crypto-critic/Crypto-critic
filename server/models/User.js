@@ -23,7 +23,7 @@ const UserSchema = new Schema({
         required: true,
         default: 0
     },
-    index: {
+    walletIndex: {
         type: Number,
         required: true,
         unique: true
@@ -35,14 +35,14 @@ const UserSchema = new Schema({
     avatar: {
         type: String
     },
-    date: {
+    dateCreated: {
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
     wallet: [{
-        coinId: {type: String, ref: 'lists'},
+        coinId: {type: String, ref: 'List'},
         amount: {type: Number}
     }]
 });
-const User = mongoose.model('users', UserSchema);
+const User = mongoose.model('User', UserSchema);
 module.exports = User;

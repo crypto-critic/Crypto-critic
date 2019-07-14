@@ -2,12 +2,13 @@ const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
-const validateRegisterInput = require('../validation/register');
-const validateLoginInput = require('../validation/login');
+const validateRegisterInput = require('../services/register.validation');
+const validateLoginInput = require('../services/login.validation');
 const mongoose = require('mongoose');
-const User = require(`../models/user`);
-const Vote = require(`../models/vote`);
-const Transaction = require(`../models/transaction`);
+const User = require(`../models/User`);
+const Vote = require(`../models/Vote`);
+const List = require('../models/ListCoin');
+const Transaction = require(`../models/Transaction`);
 
 module.exports = (router)=>{
     router.post('/users/register', async (req, res) => {
@@ -16,7 +17,6 @@ module.exports = (router)=>{
             return res.status(400).json(errors);
         }
         let count = await User.count();
-        console.log(count)
         User.findOne({
             email: req.body.email
         }).then(user => {
@@ -26,7 +26,6 @@ module.exports = (router)=>{
                 });
             }
             else {
-
                 bcrypt.genSalt(10, (err, salt) => {
                     if(err) console.error('There was an error', err);
                     else {
@@ -38,8 +37,8 @@ module.exports = (router)=>{
                                     name: req.body.name,
                                     email: req.body.email,
                                     password: hash,
-                                    role: 0,
-                                    index: count + 1
+                                    role: req.body.role || 0,
+                                    walletIndex: count + 1
                                 });
                                 newUser
                                     .save()
@@ -99,6 +98,7 @@ module.exports = (router)=>{
 
     router.get('/users/info', passport.authenticate('jwt', { session: false }), async (req, res) => {
         let _id = req.user._id;
+        let currentUser = await User.findOne({_id: _id});
         let sentTransaction = await Transaction.find({from: _id});
         let receiveTransaction = await Transaction.find({to: _id});
         res.json({
@@ -111,7 +111,7 @@ module.exports = (router)=>{
                 sentTransaction: sentTransaction,
                 receiveTransaction: receiveTransaction
             },
-            balance: 0
+            balance: wallet
         });
     });
 
@@ -126,7 +126,7 @@ module.exports = (router)=>{
                 { $set: { vote: !data.vote}}
             )
         }
-    })
+    });
 
     router.post('/users/transfer', passport.authenticate('jwt', { session: false }), async (req, res) => {
         let coinId = req.body.coinId;
@@ -143,6 +143,34 @@ module.exports = (router)=>{
             )
         }
 
-    })
+    });
+
+    router.post('/admin/insert_coin', passport.authenticate('jwt', { session: false }), async (req, res) => {
+        let role = req.user.role;
+        if (role === 2) {
+            var check = await List.findOne({coinId: req.body.coinId});
+            if (check === null){
+                let newCoin = new List({
+                    coinId: req.body.coinId,
+                    name: req.body.name,
+                    active: req.body.active || true,
+                    category: req.body.category
+                });
+                await newCoin.save();
+                res.status(200).json({status: 'success', message: `Save ${req.body.name} to Database!`});
+            } else {
+                res.status(401).json({status: 'error', message: `${req.body.name} already exist!`});
+            }
+        }
+    });
+
+    router.post('/admin/change_coin_status', passport.authenticate('jwt', { session: false }), async (req, res) => {
+        let role = req.user.role;
+        if (role === 2) {
+            let currentStatus = await List.findOne({coinId: req.body.coinId});
+            await List.update({coinId: req.body.coinId}, {$set: {active: !currentStatus.active}});
+            res.status(200).json({status: 'success', message: `${req.body.coinId}${currentStatus.active === true ? ' deactive' : ' active'}`});
+        }
+    });
 };
 
