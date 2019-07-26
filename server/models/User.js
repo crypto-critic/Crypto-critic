@@ -40,9 +40,13 @@ const UserSchema = new Schema({
         default: Date.now()
     },
     wallet: [{
-        coinId: {type: String, ref: 'List'},
-        amount: {type: Number}
+        _id: false,
+        coinId: {type: String, ref: 'lists'},
+        address: {type: String},
+        balance: {type: Number},
+        active: {type: Number},
+        lock: {type: Number}
     }]
 });
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model('users', UserSchema);
 module.exports = User;

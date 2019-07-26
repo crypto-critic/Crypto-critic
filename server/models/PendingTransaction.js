@@ -36,5 +36,5 @@ const PendingTransactionSchema = new Schema({
         required: true,
     }
 });
-const PendingTransaction =  mongoose.model('PendingTransaction', PendingTransactionSchema);
+const PendingTransaction =  mongoose.model('pendingTransactions', PendingTransactionSchema);
 module.exports = PendingTransaction;
