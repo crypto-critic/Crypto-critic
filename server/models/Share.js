@@ -2,7 +2,7 @@ var mongoose = require('mongoose')
   , Schema = mongoose.Schema;
  
 var ShareSchema = new Schema({
-  id: { type: String, unique: true, index: true },
+  shareId: { type: String, unique: true, index: true },
   active: { type: Boolean, default: true },
   basedata: {
     logo: { type: String, default: '' },
@@ -25,4 +25,4 @@ var ShareSchema = new Schema({
     withdraw: { type: String, default: '' }
   }]
 });
-module.exports = mongoose.model('Share', ShareSchema);
+module.exports = mongoose.model('shares', ShareSchema);

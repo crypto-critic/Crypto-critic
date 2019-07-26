@@ -3,11 +3,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-    _id: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        unique: true
-    },
     email: {
         type: String,
         required: true,
@@ -23,11 +18,6 @@ const UserSchema = new Schema({
         required: true,
         default: 0
     },
-    walletIndex: {
-        type: Number,
-        required: true,
-        unique: true
-    },
     name: {
         type: String,
         required: true
@@ -39,14 +29,6 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now()
     },
-    wallet: [{
-        _id: false,
-        coinId: {type: String, ref: 'lists'},
-        address: {type: String},
-        balance: {type: Number},
-        active: {type: Number},
-        lock: {type: Number}
-    }]
 });
 const User = mongoose.model('users', UserSchema);
 module.exports = User;

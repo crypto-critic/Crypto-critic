@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const CoinSchema = new Schema({
-  _id: { type: Schema.Types.ObjectId, unique: true},
   coinId: { type: String, unique: true, index: true },
   name: { type: String, default: '' },
   localization:  {type: Object, default: {}},
