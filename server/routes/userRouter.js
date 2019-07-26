@@ -9,6 +9,7 @@ const User = require(`../models/User`);
 const Vote = require(`../models/Vote`);
 const List = require('../models/ListCoin');
 const Transaction = require(`../models/Transaction`);
+const getChildKey = require('../keystore/bip44');
 
 module.exports = (router)=>{
     router.post('/users/register', async (req, res) => {
@@ -22,7 +23,8 @@ module.exports = (router)=>{
         }).then(user => {
             if(user) {
                 return res.status(400).json({
-                    email: 'Email already exists'
+                    status: 'error',
+                    message: 'Email already exists'
                 });
             }
             else {
@@ -63,8 +65,7 @@ module.exports = (router)=>{
         User.findOne({email})
             .then(user => {
                 if(!user) {
-                    errors.email = 'User not found';
-                    return res.status(404).json(errors);
+                    return res.status(404).json({status: 'error', message: 'User not found!'});
                 }
                 bcrypt.compare(password, user.password)
                     .then(isMatch => {
@@ -82,67 +83,115 @@ module.exports = (router)=>{
                                 if(err) console.error('There is some error in token', err);
                                 else {
                                     res.json({
-                                        success: true,
+                                        status: 'success',
                                         token: `Bearer ${token}`
                                     });
                                 }
                             });
                         }
                         else {
-                            errors.password = 'Incorrect Password';
-                            return res.status(400).json(errors);
+                            return res.status(400).json({status: 'error', message: 'Incorrect password!'});
                         }
                     });
             });
     });
 
     router.get('/users/info', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let _id = req.user._id;
-        let currentUser = await User.findOne({_id: _id});
-        let sentTransaction = await Transaction.find({from: _id});
-        let receiveTransaction = await Transaction.find({to: _id});
+        let email = req.user.email;
+        console.log('aa')
+        let currentUser = await User.findOne({email: email});
+        let sentTransaction = await Transaction.find({from: email});
+        let receiveTransaction = await Transaction.find({to: email});
         res.json({
-            _id: req.user._id,
             name: req.user.name,
             email: req.user.email,
             index: req.user.index,
             role: req.user.role,
-            transaction: {
-                sentTransaction: sentTransaction,
-                receiveTransaction: receiveTransaction
-            },
-            balance: wallet
+            sentTransaction,
+            receiveTransaction,
+            wallet: currentUser.wallet
         });
     });
 
-    router.get('/users/voteFor', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let data = await Vote.findOne({ userId: req.user._id, coinId: req.query.coinId});
-        if (data == null) {
-            let newVote = new Vote({ userId: req.user._id, coinId: req.params.coinId, vote: true });
-            newVote.save();
-        } else {
-            Vote.update(
-                { userId: req.user._id, coinId: req.params.coinId},
-                { $set: { vote: !data.vote}}
+    router.get('/users/wallet/create_wallet', passport.authenticate('jwt', { session: false }), async (req, res) => {
+        let coinId = req.query.coinId;
+        let email = req.user.email;
+        let walletIndex = req.user.walletIndex;
+        let address = await getChildKey(coinId, walletIndex);
+        let p2pkh = address.p2pkh;
+        let priv = address.wif;
+        let currentWallet = await User.findOne({email, 'wallet.coinId': coinId});
+        if (currentWallet === null){
+            await User.update(
+                {email},
+                {$push: {wallet : {
+                    coinId,
+                    address: p2pkh,
+                    balance: 0
+                }}}
             )
+            res.status(200).json({status: 'success', address: p2pkh, priv });
+        } else {
+            res.status(400).json({status: 'error', message: `One user have just one ${coinId} wallet!`});
         }
     });
 
-    router.post('/users/transfer', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let coinId = req.body.coinId;
-        let toUserId = req.body.toUserId;
-        let amount = req.body.amount;
-        let wallet = req.user.wallet.filter(wallet => wallet.coinId === coinId);
-        // First: chect amount avaiable
-        if (amount < wallet.amount) {
-            res.status(400).json({status: 'false', message: 'Not enough balance!'});
-        } else {
-            User.update(
-                {_id: req.user._id},
-                { $inc: {}}
+    router.get('/users/wallet/delete_wallet', passport.authenticate('jwt', { session: false }), async (req, res) => {
+        let coinId = req.query.coinId;
+        let email = req.user.email;
+        let currentWallet = await User.findOne({email, 'wallet.coinId': coinId});
+        let currentBalance = currentWallet.balance || 0;
+        if (currentWallet !== null && currentBalance === 0){
+            await User.update(
+                {email},
+                {$pull: {wallet : {coinId}}}
             )
+            res.status(200).json({status: 'success', message: `Deleted ${coinId} wallet!`});
+        } else {
+            res.status(400).json({status: 'error', message: `${coinId} wallet do not exits!`});
         }
+    });
 
+    router.get('/users/vote', passport.authenticate('jwt', { session: false }), async (req, res) => {
+        let email = req.user.email;
+        let coinId = req.query.coinId;
+        let data = await Vote.findOne({ email, coinId});
+        if (data === null) {
+            await Vote.create({ email , coinId, vote: true });
+            res.status(200).json({status: 'success', message: `Voted for ${coinId}`})
+        } else {
+            await Vote.update(
+                { email, coinId},
+                { $set: { vote: !data.vote}}
+            );
+            res.status(200).json({status: 'success', message: data.vote ? `Unvoted for ${coinId}` : `Voted for ${coinId}`});
+        }
+    });
+
+    router.post('/users/wallet/transfer', passport.authenticate('jwt', { session: false }), async (req, res) => {
+        let email = req.user.email;
+        let coinId = req.body.coinId;
+        let toUserEmail = req.body.toUserEmail;
+        let amount = parseInt(req.body.amount);
+        let timeOut = req.body.timeOut;
+        let currentUser = await User.findOne({email, 'wallet.coinId': coinId});
+        let activeBalance = currentUser.wallet[0].active || 0;
+        // console.log(activeBalance)
+        // First: chect amount avaiable
+        if (amount > activeBalance) {
+            res.status(400).json({status: 'error', message: 'Not enough balance!'});
+        }
+        let toUser = await User.findOne({email: toUserEmail});
+        if (toUser === null) {
+            res.status(400).json({status: 'error', message: 'User receive your coin not exits'});
+        }
+        await User.update(
+            {email, 'wallet.coinId': coinId},
+            {$inc: {
+                'wallet.$.active': -amount,
+                'wallet.$.lock': amount
+            }}
+        )
     });
 
     router.post('/admin/insert_coin', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -161,6 +210,23 @@ module.exports = (router)=>{
             } else {
                 res.status(401).json({status: 'error', message: `${req.body.name} already exist!`});
             }
+        }
+    });
+
+    router.post('/admin/add_balance', passport.authenticate('jwt', { session: false }), async (req, res) => {
+        let role = req.user.role;
+        if (role === 2) {
+            let coinId = req.body.coinId;
+            let amount = parseInt(req.body.amount);
+            let email = req.body.toUserEmail;
+            console.log(typeof amount)
+            let currentWallet = await User.findOne({email, 'wallet.coinId': coinId});
+            // console.log(check);
+            await User.update(
+                {email, 'wallet.coinId': coinId},
+                {$inc: { 'wallet.$.balance': amount, 'wallet.$.active': amount}}
+            )
+            res.status(200).json({status: 'success', message: `Add ${amount} ${coinId} to ${email}`});
         }
     });
 
