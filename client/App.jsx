@@ -1,11 +1,12 @@
 import React from 'react';
 import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
-import {AppLayout} from './components/AppLayout'
+// import {AppLayout} from './components/AppLayout'
 import { connect } from 'react-redux';
 
 import {LoginPage} from "./components/LoginPage";
 import {RegisterPage} from "./components/RegisterPage";
 import HomePage from './components/HomePage/HomePage';
+import AgTable from './components/AgTable/AgTable2'
 
 // import Loadable from "react-loadable";
 // const LoginPage = Loadable({
@@ -45,11 +46,13 @@ export class App1 extends React.Component {
                 <AnynomousRoute path="/login" logInState={user.state} component={LoginPage} />
                 <AnynomousRoute path="/register" logInState={user.state} component={RegisterPage} />
                 <Route exact path="/home" component={HomePage} />
+                {/* <Route exact path="/table" component={AgTable} /> */}
             </Switch>
         );
         return (
             <div>
-                <AppLayout children={context}/>
+                {context}
+                {/* <AppLayout children={context}/> */}
             </div>
         );
     }

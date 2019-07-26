@@ -8,6 +8,7 @@ const appClient = resolveApp('client');
 const output = resolveApp('dist/assets/js');
 
 module.exports = {
+    watch: true,
     entry: entrypoint,
     output: {
         path: output,
@@ -49,7 +50,7 @@ module.exports = {
                 use: 'file-loader?name=/fonts/[name].  [ext]&mimetype=application/font-otf'
             },
             {
-                test: /\.(le|sc|c)ss$/,
+                test: /\.(le|c)ss$/,
                 use: [
                     'style-loader',
                     'css-loader',
@@ -59,7 +60,16 @@ module.exports = {
                         options: {
                             includePaths: [ path.resolve( './node_modules' ) ]
                         }
-                    }]
+                    }
+                ]
+            },
+            {
+                test: /\.scss$/,
+                use: [
+                    "style-loader", // creates style nodes from JS strings
+                    "css-loader", // translates CSS into CommonJS
+                    "sass-loader" // compiles Sass to CSS, using Node Sass by default
+                ]
             }
         ]
     },

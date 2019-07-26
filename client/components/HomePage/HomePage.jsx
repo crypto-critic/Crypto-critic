@@ -4,23 +4,24 @@ import CardIndex from '../CardIndex/CardIndex';
 import './homepage.css';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import "react-table/react-table.css";
-import {RankingTable} from "../RankingTable/RankingTable";
+import AgTable from '../AgTable/AgTable';
+// import "react-table/react-table.css";
+// import {RankingTable} from "../RankingTable/RankingTable";
 
-const getTableData = async (vs_currency)=>{
-    var data = await axios.get(`api/coins/markets?vs_currency=${vs_currency}&category=masternode`);
-    return data.data;
-};
+// const getTableData = async (vs_currency)=>{
+//     let data = await axios.get(`api/coins/markets?vs_currency=${vs_currency}&category=masternode`);
+//     return data.data;
+// };
 
 const HomePage = () => {
-    const [tableData, setTableData] = useState([]);
+    // const [tableData, setTableData] = useState([]);
     const money = useSelector(state => state.money.money);
-    const locale = useSelector(state => state.locale.locale);
-    useEffect(async  ()=>{
-         let res = await getTableData(money.toLowerCase());
-         setTableData(res)
-    }, []);
-    console.log(tableData);
+    // const locale = useSelector(state => state.locale.locale);
+    // useEffect(async  ()=>{
+    //      let res = await getTableData(money.toLowerCase());
+    //      setTableData(res)
+    // }, []);
+    console.log('home page' , money);
     return (
         <div className='home-quotation'>
             <div className="home-tickers-index clear">
@@ -52,9 +53,10 @@ const HomePage = () => {
             </div>
             <div className='home-table title-center'><h1>Top 100 Cryptocurrencies</h1></div>
             <div className="home-table">
-                <RankingTable
+                <AgTable money={money}/>
+                {/* <RankingTable
                     data={tableData}
-                />
+                /> */}
             </div>
         </div>
     );
