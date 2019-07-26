@@ -201,8 +201,8 @@ module.exports = (router)=>{
             if (check === null){
                 let newCoin = new List({
                     coinId: req.body.coinId,
-                    name: req.body.name,
-                    active: req.body.active || true,
+                    host: req.body.host,
+                    vpsIndex: req.body.active || true,
                     category: req.body.category
                 });
                 await newCoin.save();
