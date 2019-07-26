@@ -10,9 +10,8 @@ middleware(app);
 app.use(express.static(__dirname) );
 let router = express.Router();
 app.use("/api", router);
-require('../server/routes/coinRouter')(router);
-require('../server/routes/chartRouter')(router);
-// require('./server/routes/key')(router);
+// require('../server/routes/coinRouter')(router);
+// require('../server/routes/chartRouter')(router);
 require('../server/routes/userRouter')(router);
 
 
