@@ -1,15 +1,8 @@
 import React from 'react'
 import { render } from 'react-dom';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import store from './services/store';
-import AppInit from './AppInit'
+import { IntlProvider } from "react-intl";
 
-render(
-    <Provider store={store().store}>
-        <PersistGate loading={null} persistor={store().persistor}>
-        <AppInit />
-        </PersistGate>
-    </Provider>,
-    document.getElementById('wrapper')
-);
+import App from './App'
+render( <IntlProvider>
+            <App />
+        </IntlProvider> , document.getElementById('wrapper'));

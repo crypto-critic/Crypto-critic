@@ -1,11 +1,16 @@
 const path = require("path");
 const fs = require('fs');
 const resolveApp = relativePath => path.resolve(fs.realpathSync(process.cwd()), relativePath);
-
 const entrypoint = resolveApp('client/index.js');
-const appNodeModules =  resolveApp('node_modules');
-const appClient = resolveApp('client');
+const node_modules =  resolveApp('node_modules');
+const client = resolveApp('client');
 const output = resolveApp('dist/assets/js');
+const themes = resolveApp('client/themes');
+const components = resolveApp('client/components');
+const endpoints = resolveApp('endpoints');
+const services = resolveApp('client/services')
+const locales = resolveApp('client/locales')
+const stores = resolveApp('client/stores')
 
 module.exports = {
     watch: true,
@@ -15,20 +20,34 @@ module.exports = {
         filename: 'bundle.js'
     },
     resolve: {
-        extensions: [ '.ts', '.tsx', '.js', '.jsx', '.scss', '.css', '.less' ]
+        extensions: [ '.js', '.jsx' ],
+        alias: {
+            themes,
+            node_modules,
+            components,
+            services,
+            endpoints,
+            stores,
+            locales
+        }
     },
     module: {
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                include: appClient,
-                loader: require.resolve('babel-loader'),
-                exclude: appNodeModules
+                include: [
+                    client,
+                    path.join(__dirname, "node_modules/react-intl"),
+                    // path.join(__dirname, "node_modules/intl-messageformat"),
+                    // path.join(__dirname, "node_modules/intl-messageformat-parser")
+                ],
+                loader: 'babel-loader',
+                // exclude: resolveApp('node_modules')
             },
-            // {
-            //     test: /\.css$/,
-            //     use: [ 'style-loader', 'css-loader' ]
-            // },
+            {
+                test: /\.js.map$/,
+                loader: 'ignore-loader'
+            },
             {
                 test: /\.(png|svg|jpg|gif|ico|jpeg)$/i,
                 use: [
@@ -54,11 +73,10 @@ module.exports = {
                 use: [
                     'style-loader',
                     'css-loader',
-                    // 'postcss-loader',
                     {
                         loader: 'less-loader',
                         options: {
-                            includePaths: [ path.resolve( './node_modules' ) ]
+                            includePaths: [ resolveApp('node_modules') ]
                         }
                     }
                 ]
@@ -66,9 +84,9 @@ module.exports = {
             {
                 test: /\.scss$/,
                 use: [
-                    "style-loader", // creates style nodes from JS strings
-                    "css-loader", // translates CSS into CommonJS
-                    "sass-loader" // compiles Sass to CSS, using Node Sass by default
+                    "style-loader",
+                    "css-loader",
+                    "sass-loader"
                 ]
             }
         ]

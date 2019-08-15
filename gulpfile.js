@@ -1,3 +1,4 @@
+require('babel-polyfill')
 const gulp = require("gulp");
 const nodemon = require('gulp-nodemon');
 const spawn = require('child_process').spawn;
@@ -6,7 +7,7 @@ const webpack = require('webpack');
 const gutil    = require('gulp-util');
 const notifier = require('node-notifier');
 let devconfig = require('./config/webpack.config.dev.js');
-let statsLog      = {
+let statsLog = {
     colors: true,
     reasons: true
   };

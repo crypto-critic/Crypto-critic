@@ -12,15 +12,16 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
-    //0: user, 1: coin_owner, 2: owner
     role: {
         type: Number,
         required: true,
         default: 0
     },
-    name: {
+    firstName: {
         type: String,
-        required: true
+    },
+    lastName: {
+        type: String,
     },
     avatar: {
         type: String

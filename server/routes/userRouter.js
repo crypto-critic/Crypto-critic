@@ -1,4 +1,4 @@
-const gravatar = require('gravatar');
+require('babel-polyfill')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
@@ -10,9 +10,10 @@ const Vote = require(`../models/Vote`);
 const List = require('../models/ListCoin');
 const Transaction = require(`../models/Transaction`);
 const getChildKey = require('../keystore/bip44');
+const endpoints = require('../../endpoints/endpoints');
 
 module.exports = (router)=>{
-    router.post('/users/register', async (req, res) => {
+    router.post(endpoints.registerUrl, async (req, res) => {
         const { errors, isValid } = validateRegisterInput(req.body);
         if(!isValid) {
             return res.status(400).json(errors);
@@ -36,7 +37,8 @@ module.exports = (router)=>{
                             else {
                                 const newUser = new User({
                                     _id: new mongoose.Types.ObjectId,
-                                    name: req.body.name,
+                                    firstName: req.body.firstName,
+                                    lastName: req.body.lastName,
                                     email: req.body.email,
                                     password: hash,
                                     role: req.body.role || 0,
@@ -55,7 +57,7 @@ module.exports = (router)=>{
         });
     });
 
-    router.post('/users/login', (req, res) => {
+    router.post(endpoints.loginUrl, (req, res) => {
         const { errors, isValid } = validateLoginInput(req.body);
         if(!isValid) {
             return res.status(400).json(errors);
@@ -84,7 +86,7 @@ module.exports = (router)=>{
                                 else {
                                     res.json({
                                         status: 'success',
-                                        token: `Bearer ${token}`
+                                        token: `${token}`
                                     });
                                 }
                             });
@@ -96,21 +98,8 @@ module.exports = (router)=>{
             });
     });
 
-    router.get('/users/info', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let email = req.user.email;
-        console.log('aa')
-        let currentUser = await User.findOne({email: email});
-        let sentTransaction = await Transaction.find({from: email});
-        let receiveTransaction = await Transaction.find({to: email});
-        res.json({
-            name: req.user.name,
-            email: req.user.email,
-            index: req.user.index,
-            role: req.user.role,
-            sentTransaction,
-            receiveTransaction,
-            wallet: currentUser.wallet
-        });
+    router.get(endpoints.userInfoUrl, passport.authenticate('jwt', { session: false }), async (req, res) => {
+        return res.status(200).json(req.user);
     });
 
     router.get('/users/wallet/create_wallet', passport.authenticate('jwt', { session: false }), async (req, res) => {

@@ -1,69 +1,46 @@
 import React from 'react';
-import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
-// import {AppLayout} from './components/AppLayout'
-import { connect } from 'react-redux';
+import { Redirect, BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+// import { observer } from 'mobx-react';
+// import { history } from 'services/history';
+// import SessionStore from 'stores/session.store';
+// import UserStore from 'stores/user.store';
 
-import {LoginPage} from "./components/LoginPage";
-import {RegisterPage} from "./components/RegisterPage";
-import HomePage from './components/HomePage/HomePage';
-import AgTable from './components/AgTable/AgTable2'
+// import { WrapperLoadable, WrapperRoute } from './components';
+// import Layout from './layouts/PrimaryLayout'
+// import './app.scss'
+// import router from './router';
+// const { login, registration } = router;
 
-// import Loadable from "react-loadable";
-// const LoginPage = Loadable({
-//     loader: () =>
-//         import("./LoginPage"),
-//     loading: () => null
-// });
-// const RegisterPage = Loadable({
-//     loader: () =>
-//         import("./RegisterPage"),
-//     loading: () => null
-// });
-const UserRoute = ({ component: Component, logInState, ...rest }) => (
-    <Route {...rest} render={props => (
-        logInState === 'SUCCESS'
-            ? <Component {...props} />
-            : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
-    )} />
-);
-const AnynomousRoute = ({ component: Component, logInState, ...rest }) => (
-    <Route {...rest} render={props => (
-        logInState !== 'SUCCESS'
-            ? <Component {...props} />
-            : <Redirect to={{ pathname: '/', state: { from: props.location } }} />
-    )} />
-);
-
-export class App1 extends React.Component {
+// const Login = WrapperLoadable('./containers/Login/Login');
+// const Registration = WrapperLoadable('./containers/Registration/Registration');
+export function formatDate({ locale, formats, onError, timeZone, }, state, ...[value, options = {}]) {
+    console.log('aaa')
+}
+// @observer
+export default class App extends React.Component {
     constructor(props) {
         super(props);
+        console.log(props)
+        // this.SessionStore = SessionStore;
+        // this.UserStore = UserStore;
     }
     render() {
-        const {user} = this.props;
-        let context = (
-            <Switch>
-                <UserRoute exact path="/" logInState={user.state} component={HomePage} />
-                <AnynomousRoute path="/login" logInState={user.state} component={LoginPage} />
-                <AnynomousRoute path="/register" logInState={user.state} component={RegisterPage} />
-                <Route exact path="/home" component={HomePage} />
-                {/* <Route exact path="/table" component={AgTable} /> */}
-            </Switch>
-        );
+        // const { loginStatus } = this.SessionStore;
+        // const role = this.UserStore.role || 0;
         return (
-            <div>
-                {context}
-                {/* <AppLayout children={context}/> */}
-            </div>
+            <Router>
+                {/* <Layout>
+                    <Route> */}
+                        <Switch>
+                            {/* <Route path="/" component={Login} /> */}
+                            {/* <WrapperRoute component={Login} opts={login} role={role} /> */}
+                            {/* <WrapperRoute component={Registration} opts={registration} role={role || 0} /> */}
+                        </Switch>
+                    {/* </Route>
+                </Layout> */}
+            </Router>
         );
     }
 }
-const withRouterApp = withRouter(App1);
 
-function mapStateToProps(state) {
-    return {
-        user: state.authentication
-    };
-}
 
-const connectedApp = connect(mapStateToProps)(withRouterApp);
-export { connectedApp as App };
