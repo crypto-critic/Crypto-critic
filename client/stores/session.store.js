@@ -4,8 +4,8 @@ import {
     setValueToLocalStorage,
     removeKeyFromLocalStorage
 } from 'services/localStorage.service';
-import { login, logout } from 'services/authentication.service';
-import { authorizationKey } from 'endpoints/endpoints'
+import { loginService } from 'services/authentication.service';
+import { authorizationKey } from '../endpoints';
 
 const IDLE_TIME = 300000; // 5 minutes
 
@@ -14,7 +14,7 @@ class SessionStore {
         this.getValueFromLocalStorage = getValueFromLocalStorage;
         this.setValueToLocalStorage = setValueToLocalStorage;
         this.removeKeyFromLocalStorage = removeKeyFromLocalStorage;
-        this.loginService = login;
+        this.loginService = loginService;
         this.initData();
     }
 

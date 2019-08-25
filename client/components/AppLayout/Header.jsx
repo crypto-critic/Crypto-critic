@@ -1,84 +1,74 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, Component } from 'react';
 import { observer } from 'mobx-react';
 import { Link } from 'react-router-dom';
-import { FormattedMessage} from 'react-intl'
+import { Trans, withI18n } from '@lingui/react'
 import { Layout, Menu, Breadcrumb, Icon, Avatar, Badge, Dropdown, Tooltip, Divider, Button } from 'antd';
 import 'antd/dist/antd.less';
+import classnames from 'classnames'
+import renderEmpty from 'antd/lib/config-provider/renderEmpty';
+import styles from './Header.less'
 
 import GlobalStore from '../../stores/global.store';
 import SessionStore from '../../stores/session.store';
 import UserStore from '../../stores/user.store';
-import { languageDefinition } from '../../config';
-import classnames from 'classnames'
-import styles from './Header.less'
+import { languageDefinition, logoPath } from '../../config';
 const { SubMenu } = Menu
 
+@withI18n()
 @observer
-export default class Header extends React.Component {
-    constructor(props){
+export default class Header extends Component {
+    constructor(props) {
         super(props);
-        this.GlobalStore = GlobalStore;
-        this.SessionStore = SessionStore;
-        this.UserStore = UserStore;
+        this.globalStore = GlobalStore;
+        this.sessionStore = SessionStore;
+        this.userStore = UserStore;
     }
 
     handleChange = (data) => {
-        const { setLocalStorage } = this.GlobalStore;
+        const { setLocalStorage } = this.globalStore;
         setLocalStorage(data);
-        console.log('change to ', this.GlobalStore.money)
     }
-
+    
     handleLogout = (e) => {
-        const { logout } = this.SessionStore;
+        const { logout } = SessionStore;
         e.key === 'SignOut' && logout();
     }
 
     render() {
-        console.log('render lai')
-        const { money, moneys, language, theme } = this.GlobalStore;
-        const { loginStatus } = this.SessionStore;
-        const { email, firstName, avartar } = this.UserStore;
+        const { money, moneys, language, languages, theme } = this.globalStore;
+        const { loginStatus } = this.sessionStore;
+        const { email, firstName, avatar } = this.userStore;
+
         const leftContent = [
             <Fragment>
-                <img className="logo" src={"assets/img/logo.svg"}/>
+                <img className="logo" src={logoPath}/>
                 <Divider type="vertical" className="divider"/>
             </Fragment>
         ]
         const rightContent = loginStatus === 'AUTHENTICATED' ? [
-            <Menu key="user" mode="horizontal" onClick={this.handleClickMenu}>
-              <SubMenu
+            <Menu key="user" mode="horizontal" onClick={this.handleLogout}>
+                <SubMenu
                 title={
-                  <Fragment>
-                    <span style={{ color: '#999', marginRight: 4 }}>
-                        <FormattedMessage
-                            id="header.hello"
-                            defaultMessage={`Hello, ${name}`}
-                            values={{name: <b>{firstName}</b>}}
-                        />
-                    </span>
-                    <Avatar style={{ marginLeft: 8 }} src={avartar} />
+                    <Fragment>
+                        <span style={{ color: '#999', marginRight: 4 }}>
+                        <Trans>Hi,</Trans>
+                        </span>
+                        <span>{firstName}</span>
+                    <Avatar style={{ marginLeft: 8 }} src={avatar} />
                   </Fragment>
                 }
-              >
-                <Menu.Item key="SignOut">
-                    <FormattedMessage
-                        id="header.signout"
-                        defaultMessage={`Sign out`}
-                    />
-                </Menu.Item>
-              </SubMenu>
+                >
+                    <Menu.Item key="SignOut">
+                        <Trans>Sign out</Trans>
+                    </Menu.Item>
+                </SubMenu>
             </Menu>
         ] : [
             <Menu key="anonymos" mode="horizontal">
                 <Menu.Item>
                     <Tooltip
                         placement="bottom"
-                        label={
-                            <FormattedMessage
-                                id="header.login"
-                                defaultMessage={`Login`}
-                            />
-                        }
+                        label={<Trans>Login</Trans>}
                     >
                         <Link to="/login"><Icon type="login" /></Link>
                     </Tooltip>
@@ -86,36 +76,32 @@ export default class Header extends React.Component {
             </Menu>
         ]
             
-        if (languageDefinition) {
-            const { languages } = languageDefinition;
-            const { i18n } = this.props;
-            const currentLanguage = languages.find(
-              item => item.linguiKey === i18n._language
-            )
-            rightContent.unshift(
-                <Menu
-                key="language"
-                selectedKeys={[currentLanguage.linguiKey]}
-                onClick={data => {
-                    this.handleChange({ key: 'language', value: data.key }) 
-                }}
-                mode="horizontal"
-                >
-                    <SubMenu title={<Avatar size="small" src={currentLanguage.flag} />}>
-                    {languages.map(item => (
-                        <Menu.Item key={item.linguiKey}>
+        const currentLanguage = languages.find(
+            item => item.languageKey === language
+        )
+        rightContent.unshift(
+            <Menu
+            key="language"
+            selectedKeys={[currentLanguage.languageKey]}
+            onClick={data => {
+                this.handleChange({ key: 'language', value: data.key }) 
+            }}
+            mode="horizontal"
+            >
+                <SubMenu title={<Avatar size="small" src={currentLanguage.flag} />}>
+                {languages.map(item => (
+                    <Menu.Item key={item.languageKey}>
                         <Avatar
                             size="small"
                             style={{ marginRight: 8 }}
                             src={item.flag}
                         />
                         {item.title}
-                        </Menu.Item>
-                    ))}
-                    </SubMenu>
-                </Menu>
-            )
-        }
+                    </Menu.Item>
+                ))}
+                </SubMenu>
+            </Menu>
+        )
         
         const menuDropdown = (
             <Menu
@@ -138,25 +124,7 @@ export default class Header extends React.Component {
             <Dropdown overlay={menuDropdown} placement="bottomLeft">
                 <Button>{money.toUpperCase()+ " "}<i className="fas fa-caret-down" /></Button>
             </Dropdown>
-            // <Button>
-            // <Menu
-            //     key="money"
-            //     selectedKeys={money}
-            //     onClick={data => {
-                //         this.handleChange({ money: data.key }) 
-                //     }}
-                //     mode="horizontal"
-                // >
-                //     <SubMenu title={money}>
-                //     {moneys.map(item => (
-                    //         <Menu.Item key={item}>
-                    //         {item}
-                    //         </Menu.Item>
-                    //     ))}
-                    //     </SubMenu>
-                    // </Menu>
-                    // </Button>
-                    )
+        )
         return (
             <Fragment>
                 <Layout.Header className="header" id="layoutHeader" >

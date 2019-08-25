@@ -1,10 +1,10 @@
 import { observable, action, computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { register } from '../../services/authentication.service';
+import { registerService } from '../../services/authentication.service';
 
 class RegisterStore {
     constructor() {
-        this.registerService = register;
+        this.registerService = registerService;
     }
 
     @observable user = {

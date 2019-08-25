@@ -12,13 +12,13 @@ const fs = require('fs')
 const path = require('path')
 const axios = require('axios')
 const jsonFormat = require('json-format')
-const { languageDefinition } = require('../client/config');
+const { languageDefinition } = require('../config')
 const { languages, defaultLanguage } = languageDefinition;
 
 const locales = {}
 
 languages.forEach(item => {
-  locales[item.linguiKey] = require(`../client/locales/${item.linguiKey}/messages.json`)
+  locales[item.languageKey] = require(`./${item.languageKey}/messages.json`)
 })
 
 const youdao = ({ q, from, to }) =>
@@ -95,7 +95,7 @@ const transform = async ({ from, to, locales, outputPath }) => {
   const tasks = languages
     .map(item => ({
       from: defaultLanguage,
-      to: item.linguiKey,
+      to: item.languageKey,
     }))
     .filter(item => item.from !== item.to)
 
@@ -105,7 +105,7 @@ const transform = async ({ from, to, locales, outputPath }) => {
       from: item.from,
       to: item.to,
       locales,
-      outputPath: `../client/locales/${item.to}/messages.json`,
+      outputPath: `./${item.to}/messages.json`,
     })
     console.log(`completed: ${item.from} -> ${item.to}`)
   }

@@ -1,0 +1,26 @@
+{
+  "Remember me": {
+    "origin": [
+      [
+        "client/containers/login/Login.jsx",
+        48
+      ]
+    ]
+  },
+  "Forgot password": {
+    "origin": [
+      [
+        "client/containers/login/Login.jsx",
+        50
+      ]
+    ]
+  },
+  "register now!": {
+    "origin": [
+      [
+        "client/containers/login/Login.jsx",
+        55
+      ]
+    ]
+  }
+}

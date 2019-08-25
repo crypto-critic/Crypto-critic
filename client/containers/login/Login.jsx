@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import 'antd/dist/antd.less';
+import { Trans, withI18n } from '@lingui/react'
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
 import './login.less'
 
+@withI18n()
 class NormalLoginForm extends React.Component {
   handleSubmit = e => {
     e.preventDefault();
@@ -43,14 +45,14 @@ class NormalLoginForm extends React.Component {
           {getFieldDecorator('remember', {
             valuePropName: 'checked',
             initialValue: true,
-          })(<Checkbox>Remember me</Checkbox>)}
+          })(<Checkbox><Trans>Remember me</Trans></Checkbox>)}
           <a className="login-form-forgot" href="">
-            Forgot password
+            <Trans>Forgot password</Trans>
           </a>
           <Button type="primary" htmlType="submit" className="login-form-button">
             Log in
           </Button>
-          Or <Link to="/registration">register now!</Link>
+          Or <Link to="/registration"><Trans>register now!</Trans></Link>
         </Form.Item>
       </Form>
     );

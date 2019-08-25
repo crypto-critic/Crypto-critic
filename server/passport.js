@@ -1,4 +1,4 @@
-const authorizationKey = require('../endpoints/endpoints').authorizationKey;
+const { authorizationKey } = require('./endpoints');
 const JWTStrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 const User = require('./models/User');

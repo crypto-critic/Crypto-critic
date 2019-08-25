@@ -1,7 +1,7 @@
 import { observable, action, computed, observe } from 'mobx';
 import { getUserInfo } from 'services/user.service';
 import SessionStore from 'stores/session.store';
-import { authorizationKey } from 'endpoints/endpoints'
+import { authorizationKey } from '../endpoints';
 
 class UserStore {
     constructor() {

@@ -1,7 +1,8 @@
 const path = require("path");
 const fs = require('fs');
 const resolveApp = relativePath => path.resolve(fs.realpathSync(process.cwd()), relativePath);
-const entrypoint = resolveApp('client/index.js');
+const clientEntryPoint = resolveApp('client/index.js');
+const serverEntryPoint = resolveApp('dist/server.js')
 const node_modules =  resolveApp('node_modules');
 const client = resolveApp('client');
 const output = resolveApp('dist/assets/js');
@@ -13,8 +14,9 @@ const locales = resolveApp('client/locales')
 const stores = resolveApp('client/stores')
 
 module.exports = {
+    mode: 'development',
     watch: true,
-    entry: entrypoint,
+    entry: clientEntryPoint,
     output: {
         path: output,
         filename: 'bundle.js'
@@ -36,8 +38,9 @@ module.exports = {
             {
                 test: /\.(js|jsx)$/,
                 include: [
+                    endpoints,
                     client,
-                    path.join(__dirname, "node_modules/react-intl"),
+                    path.join(__dirname, "../node_modules/react-intl"),
                     // path.join(__dirname, "node_modules/intl-messageformat"),
                     // path.join(__dirname, "node_modules/intl-messageformat-parser")
                 ],

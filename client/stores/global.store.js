@@ -11,9 +11,9 @@ class GlobalStore {
         this.getValueFromLocalStorage = getValueFromLocalStorage;
         this.setValueToLocalStorage = setValueToLocalStorage;
         this.moneys = moneys;
-        this.localeProviderLanguages = [];
+        this.languages = languages;
         this.initData();
-        observe(this, 'languageListen', this.loadCatalog());
+        observe(this, 'language', ({ newValue }) => this.loadCatalog({ language: newValue }))
     }
 
     @observable money;
@@ -22,25 +22,15 @@ class GlobalStore {
 
     @observable theme;
 
-    @observable catalog;
-    
-    @computed get languageListen() {
-        return this.language;
-    }
+    @observable catalogs = {};
 
-
-    @action initData = async () => {
+    @action initData = () => {
         let money = this.getValueFromLocalStorage('money') || defaultMoney;
         let language = this.getValueFromLocalStorage('language') || defaultLanguage;
         let theme = this.getValueFromLocalStorage('theme') || defaultTheme;
         this.setLocalStorage({ key: 'language', value: language });
         this.setLocalStorage({ key: 'money', value: money });
         this.setLocalStorage({ key: 'theme', value: theme });
-        await languages.forEach(item => {
-            this.localeProviderLanguages.push({
-                [item.linguiKey]: import(`antd/es/locale/${item.localeProviderKey}`)
-            })
-        });
         this.loadCatalog();
     }
 
@@ -53,12 +43,13 @@ class GlobalStore {
         this.setValueToLocalStorage({ key, value });
     }
 
-    @action loadCatalog = () => {
-        const { language, set } = this;
-        const catalog = import(`../locales/${language}/messages.json`);
-        set({
-            catalog: { [language]: catalog }
-        })
+    @action loadCatalog = ({ language } = { language: 'en' }) => {
+        const catalog = import(
+            /* webpackMode: "lazy", webpackChunkName: "i18n-[index]" */
+            `@lingui/loader!../locales/${language}/messages.json`
+            )
+            console.log('catalog: ', catalog);
+        Object.assign(this.catalogs, { [this.language]: catalog })
     }
 }
 

@@ -10,18 +10,25 @@ const Vote = require(`../models/Vote`);
 const List = require('../models/ListCoin');
 const Transaction = require(`../models/Transaction`);
 const getChildKey = require('../keystore/bip44');
-const endpoints = require('../../endpoints/endpoints');
+const {
+    apiPrefix,
+    authorizationKey,
+    login,
+    register,
+    userInfo,
+    userWalletManagement
+} = require('../endpoints');
 
 module.exports = (router)=>{
-    router.post(endpoints.registerUrl, async (req, res) => {
+    router.post(register.path, async (req, res) => {
+        const { password, firstName, lastName, email, role } = req.body;
         const { errors, isValid } = validateRegisterInput(req.body);
         if(!isValid) {
             return res.status(400).json(errors);
         }
         let count = await User.count();
-        User.findOne({
-            email: req.body.email
-        }).then(user => {
+        User.findOne({ email})
+            .then(user => {
             if(user) {
                 return res.status(400).json({
                     status: 'error',
@@ -32,16 +39,16 @@ module.exports = (router)=>{
                 bcrypt.genSalt(10, (err, salt) => {
                     if(err) console.error('There was an error', err);
                     else {
-                        bcrypt.hash(req.body.password, salt, (err, hash) => {
+                        bcrypt.hash(password, salt, (err, hash) => {
                             if(err) console.error('There was an error', err);
                             else {
                                 const newUser = new User({
                                     _id: new mongoose.Types.ObjectId,
-                                    firstName: req.body.firstName,
-                                    lastName: req.body.lastName,
-                                    email: req.body.email,
+                                    firstName,
+                                    lastName,
+                                    email,
                                     password: hash,
-                                    role: req.body.role || 0,
+                                    role: role || 'user',
                                     walletIndex: count + 1
                                 });
                                 newUser
@@ -57,14 +64,13 @@ module.exports = (router)=>{
         });
     });
 
-    router.post(endpoints.loginUrl, (req, res) => {
+    router.post(login.path, (req, res) => {
         const { errors, isValid } = validateLoginInput(req.body);
         if(!isValid) {
             return res.status(400).json(errors);
         }
-        const email = req.body.email;
-        const password = req.body.password;
-        User.findOne({email})
+        const { email, password } = req.body;
+        User.findOne({ email })
             .then(user => {
                 if(!user) {
                     return res.status(404).json({status: 'error', message: 'User not found!'});
@@ -98,17 +104,15 @@ module.exports = (router)=>{
             });
     });
 
-    router.get(endpoints.userInfoUrl, passport.authenticate('jwt', { session: false }), async (req, res) => {
+    router.get(userInfo.path, passport.authenticate('jwt', { session: false }), async (req, res) => {
         return res.status(200).json(req.user);
     });
 
-    router.get('/users/wallet/create_wallet', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let coinId = req.query.coinId;
-        let email = req.user.email;
-        let walletIndex = req.user.walletIndex;
+    router.get(userWalletManagement.createWalletPath, passport.authenticate('jwt', { session: false }), async (req, res) => {
+        let { coinId } = req.query;
+        let { email, walletIndex } = req.user;
         let address = await getChildKey(coinId, walletIndex);
-        let p2pkh = address.p2pkh;
-        let priv = address.wif;
+        let { p2pkh, wif } = address;
         let currentWallet = await User.findOne({email, 'wallet.coinId': coinId});
         if (currentWallet === null){
             await User.update(
@@ -119,21 +123,20 @@ module.exports = (router)=>{
                     balance: 0
                 }}}
             )
-            res.status(200).json({status: 'success', address: p2pkh, priv });
+            res.status(200).json({ status: 'success', p2pkh, wif });
         } else {
-            res.status(400).json({status: 'error', message: `One user have just one ${coinId} wallet!`});
+            res.status(400).json({ status: 'error', message: `One user have just one ${coinId} wallet!` });
         }
     });
 
-    router.get('/users/wallet/delete_wallet', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let coinId = req.query.coinId;
-        let email = req.user.email;
+    router.get(userWalletManagement.deleteWalletPath, passport.authenticate('jwt', { session: false }), async (req, res) => {
+        let { coinId, email } = req.query;
         let currentWallet = await User.findOne({email, 'wallet.coinId': coinId});
         let currentBalance = currentWallet.balance || 0;
         if (currentWallet !== null && currentBalance === 0){
             await User.update(
                 {email},
-                {$pull: {wallet : {coinId}}}
+                {$pull: {wallet : { coinId }}}
             )
             res.status(200).json({status: 'success', message: `Deleted ${coinId} wallet!`});
         } else {
@@ -142,8 +145,7 @@ module.exports = (router)=>{
     });
 
     router.get('/users/vote', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let email = req.user.email;
-        let coinId = req.query.coinId;
+        let { coinId, email } = req.query;
         let data = await Vote.findOne({ email, coinId});
         if (data === null) {
             await Vote.create({ email , coinId, vote: true });
@@ -158,11 +160,9 @@ module.exports = (router)=>{
     });
 
     router.post('/users/wallet/transfer', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let email = req.user.email;
-        let coinId = req.body.coinId;
-        let toUserEmail = req.body.toUserEmail;
+        let { email } = req.user;
+        let { coinId, toUserEmail, timeOut } = req.body;
         let amount = parseInt(req.body.amount);
-        let timeOut = req.body.timeOut;
         let currentUser = await User.findOne({email, 'wallet.coinId': coinId});
         let activeBalance = currentUser.wallet[0].active || 0;
         // console.log(activeBalance)
@@ -184,8 +184,8 @@ module.exports = (router)=>{
     });
 
     router.post('/admin/insert_coin', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let role = req.user.role;
-        if (role === 2) {
+        let { role } = req.user;
+        if (role === 'admin') {
             var check = await List.findOne({coinId: req.body.coinId});
             if (check === null){
                 let newCoin = new List({
@@ -203,28 +203,26 @@ module.exports = (router)=>{
     });
 
     router.post('/admin/add_balance', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let role = req.user.role;
-        if (role === 2) {
-            let coinId = req.body.coinId;
-            let amount = parseInt(req.body.amount);
-            let email = req.body.toUserEmail;
-            console.log(typeof amount)
-            let currentWallet = await User.findOne({email, 'wallet.coinId': coinId});
-            // console.log(check);
+        let { role } = req.user;
+        if (role === 'admin') {
+            let { coinId, amount: a, toUserEmail } = req.body;
+            let amount = parseInt(a);
+            let currentWallet = await User.findOne({email: toUserEmail, 'wallet.coinId': coinId});
             await User.update(
                 {email, 'wallet.coinId': coinId},
                 {$inc: { 'wallet.$.balance': amount, 'wallet.$.active': amount}}
             )
-            res.status(200).json({status: 'success', message: `Add ${amount} ${coinId} to ${email}`});
+            res.status(200).json({status: 'success', message: `Add ${amount} ${coinId} to ${toUserEmail}`});
         }
     });
 
     router.post('/admin/change_coin_status', passport.authenticate('jwt', { session: false }), async (req, res) => {
-        let role = req.user.role;
-        if (role === 2) {
-            let currentStatus = await List.findOne({coinId: req.body.coinId});
-            await List.update({coinId: req.body.coinId}, {$set: {active: !currentStatus.active}});
-            res.status(200).json({status: 'success', message: `${req.body.coinId}${currentStatus.active === true ? ' deactive' : ' active'}`});
+        let { role } = req.user;
+        let { coinId } = req.body;
+        if (role === 'admin') {
+            let currentStatus = await List.findOne({ coinId });
+            await List.update({ coinId }, {$set: {active: !currentStatus.active}});
+            res.status(200).json({status: 'success', message: `${coinId}${currentStatus.active === true ? ' deactive' : ' active'}`});
         }
     });
 };

@@ -1,5 +1,5 @@
 import { handleResponse } from './handleResponse';
-import { apiPrefix, userInfoUrl } from 'endpoints/endpoints';
+import { apiPrefix, userInfo } from '../endpoints';
 
 export const getUserInfo = async (headers) => {
     const requestOptions = {
@@ -7,6 +7,6 @@ export const getUserInfo = async (headers) => {
         headers,
         body: JSON.stringify(user)
     };
-    let requestUrl = domain ? ( domain + apiPrefix + userInfoUrl) : (apiPrefix + userInfoUrl)
+    let requestUrl = domain ? ( domain + apiPrefix + userInfo.path) : (apiPrefix + userInfo.path)
     return fetch(requestUrl, requestOptions).then(handleResponse);
 };
