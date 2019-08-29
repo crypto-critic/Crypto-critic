@@ -15,6 +15,11 @@ module.exports = {
         title: 'Tiếng Việt',
         flag: 'assets/img/flags/vi.svg',
       },
+      {
+        languageKey: 'jp',
+        title: 'Tiếng Việt',
+        flag: 'assets/img/flags/jp.svg',
+      },
     ],
     defaultLanguage: 'en',
   },

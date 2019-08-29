@@ -6,6 +6,7 @@ const serverEntryPoint = resolveApp('dist/server.js')
 const node_modules =  resolveApp('node_modules');
 const client = resolveApp('client');
 const output = resolveApp('dist/assets/js');
+const assets = resolveApp('dist/assets');
 const themes = resolveApp('client/themes');
 const components = resolveApp('client/components');
 const endpoints = resolveApp('endpoints');
@@ -21,6 +22,30 @@ module.exports = {
         path: output,
         filename: 'bundle.js'
     },
+    optimization: {
+        splitChunks: {
+          chunks: 'async',
+          minSize: 30000,
+          maxSize: 0,
+          minChunks: 1,
+          maxAsyncRequests: 5,
+          maxInitialRequests: 3,
+          automaticNameDelimiter: '~',
+          automaticNameMaxLength: 30,
+          name: true,
+          cacheGroups: {
+            vendors: {
+              test: /[\\/]node_modules[\\/]/,
+              priority: -10
+            },
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true
+            }
+          }
+        }
+    },
     resolve: {
         extensions: [ '.js', '.jsx' ],
         alias: {
@@ -30,7 +55,8 @@ module.exports = {
             services,
             endpoints,
             stores,
-            locales
+            locales,
+            assets
         }
     },
     module: {
@@ -98,7 +124,14 @@ module.exports = {
                     "css-loader",
                     "sass-loader"
                 ]
-            }
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    'css-loader'
+                ]
+            },
         ]
     },
     devtool: "cheap-module-eval-source-map"
