@@ -27,17 +27,9 @@ class RegisterStore {
         }
     }
 
-    @action setUser = (name, value) => {
-        this.user = {
-            ...this.user,
-            [name]: value
-        };
+    @action setProperties = () => {
+        Object.assign(this, )
     }
-
-    @action setSubmitted = (state) => {
-        this.submitted = state;
-    }
-
 }
 
 const AppRegisterStore = new RegisterStore();

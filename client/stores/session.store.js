@@ -3,11 +3,13 @@ import {
     getValueFromLocalStorage,
     setValueToLocalStorage,
     removeKeyFromLocalStorage
-} from 'services/localStorage.service';
-import { loginService } from 'services/authentication.service';
+} from '../services/localStorage.service';
+import { loginService } from '../services/authentication.service';
 import { authorizationKey } from '../endpoints';
+import { authenticationConstants } from '../constants/globalConstants';
+import { UserStore } from '../stores';
 
-const IDLE_TIME = 300000; // 5 minutes
+const { AUTHENTICATED, UNAUTHENTICATED, IDLE_TIME } = authenticationConstants;
 
 class SessionStore {
     constructor() {
@@ -18,7 +20,7 @@ class SessionStore {
         this.initData();
     }
 
-    @observable loginStatus = 'UNAUTHENTICATED';
+    @observable authenticationStatus = UNAUTHENTICATED;
 
     @observable token = '';
 
@@ -30,27 +32,28 @@ class SessionStore {
     @action initData = () => {
         this.token = this.getValueFromLocalStorage(authorizationKey);
         if (this.token && this.isIdle) {
-            this.loginStatus = 'AUTHENTICATED';
+            this.authenticationStatus = AUTHENTICATED;
             return;
         }
         this.logout();
     }
 
-    @action login = async (email, password) => {
-        let user = await this.loginService(email, password);
+    @action login = async (query) => {
+        const { email, password } = query;
+        let user = await this.loginService({ email, password });
         if (user && user.token) {
-            Object.assign(this, {
-                loginStatus: 'AUTHENTICATED',
-                token: user.token
-            })
-            this.setValueToLocalStorage('actionTime', Date.now());
-            this.setValueToLocalStorage('Cryptocritic_token', user.token);
+            this.authenticationStatus = AUTHENTICATED;
+            this.token = user.token
+            console.log('here')
+            this.setValueToLocalStorage({key: 'actionTime', value: Date.now() });
+            this.setValueToLocalStorage({key: authorizationKey, value: user.token});
+            UserStore.fetchData();
         }
     }
     
     @action logout = () => {
         Object.assign(this, {
-            loginStatus: 'UNAUTHENTICATED',
+            authenticationStatus: UNAUTHENTICATED,
             token: '',
         })
         this.removeKeyFromLocalStorage(authorizationKey);

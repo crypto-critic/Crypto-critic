@@ -72,16 +72,23 @@ module.exports = {
                 use: 'file-loader?name=/fonts/[name].  [ext]&mimetype=application/font-otf'
             },
             {
-                test: /\.(le|c)ss$/,
+                test: /\.less$/,
                 use: [
                     'style-loader',
                     'css-loader',
                     {
                         loader: 'less-loader',
                         options: {
-                            includePaths: [ resolveApp('node_modules') ]
+                            includePaths: [ node_modules ]
                         }
                     }
+                ]
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    'css-loader'
                 ]
             },
             {

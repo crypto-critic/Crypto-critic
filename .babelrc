@@ -20,7 +20,7 @@
     "@babel/plugin-proposal-export-default-from",
     "@babel/plugin-syntax-dynamic-import",
     "transform-class-properties",
-    ["import", { "libraryName": "antd", "libraryDirectory": "lib", "style": true}],
+    ["import", { "libraryName": "antd", "libraryDirectory": "lib", "style": "css"}]
   ],
   "env": {
     "production": {

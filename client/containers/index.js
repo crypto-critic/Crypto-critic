@@ -1,7 +1,7 @@
-import Login from './login/Login';
-import Registration from './registration/Registration';
+import Login from './Login/Login';
+import Register from './Register/Register';
 
 export {
     Login,
-    Registration,
+    Register,
 }

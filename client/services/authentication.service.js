@@ -1,21 +1,26 @@
 import { apiPrefix, login , register } from '../endpoints';
-import { handleResponse } from './handleResponse';
-export const loginService = async ({ email, password }, { domain } = undefined ) => {
-    let requestOptions = {
-        method: 'POST',
+import axios from 'axios';
+export const loginService = (query) => new Promise((res) => {
+    const { email, password, domain } = query
+    let opts = {
+        method: 'post',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        data: JSON.stringify({ email, password }),
+        url: domain ? ( domain + apiPrefix + login.path) : (apiPrefix + login.path)
     };
-    let requestUrl = domain ? ( domain + apiPrefix + login.path) : (apiPrefix + login.path)
-    return fetch(requestUrl, requestOptions).then(handleResponse);
-}
+    axios(opts)
+        .then(result => res(result.data))
+        .catch(err => console.log(err));
+});
 
-export const registerService = (user, { domain } = undefined) => {
-    const requestOptions = {
-        method: 'POST',
+export const registerService = (user) => {
+    const opts = {
+        method: 'post',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user)
+        data: JSON.stringify(user),
+        url: apiPrefix + register.path
     };
-    let requestUrl = domain ? ( domain + apiPrefix + register.path) : (apiPrefix + register.path)
-    return fetch(requestUrl, requestOptions).then(handleResponse);
+    axios(opts)
+        .then(result => res(result.data))
+        .catch(err => console.log(err));
 }

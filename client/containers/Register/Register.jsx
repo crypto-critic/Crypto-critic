@@ -1,6 +1,6 @@
 import React from 'react';
 import 'antd/dist/antd.less';
-import './registration.less';
+import './register.less';
 import {
   Form,
   Input,
@@ -18,8 +18,8 @@ import {
 const { Option } = Select;
 const AutoCompleteOption = AutoComplete.Option;
 
-
-class RegistrationForm extends React.Component {
+@Form.create()
+class RegisterForm extends React.Component {
   state = {
     confirmDirty: false,
     autoCompleteResult: [],
@@ -87,7 +87,7 @@ class RegistrationForm extends React.Component {
       <Form
         // {...formItemLayout}
         onSubmit={this.handleSubmit}
-        className="registration"
+        className="register"
       >
         <Form.Item label="Email">
           {getFieldDecorator('email', {
@@ -162,7 +162,5 @@ class RegistrationForm extends React.Component {
   }
 }
 
-const WrappedRegistrationForm = Form.create({ name: 'register' })(RegistrationForm);
-
-export default WrappedRegistrationForm;
+export default RegisterForm;
           

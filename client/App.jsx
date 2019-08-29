@@ -2,16 +2,13 @@ import React from 'react';
 import { Redirect, BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { history } from './services/history';
-import SessionStore from './stores/session.store';
-import UserStore from './stores/user.store';
-
-import { WrapperLoadable, WrapperRoute } from './components';
+import { SessionStore, UserStore } from './stores';
+import { WrapperRoute } from './components';
 import Layout from './layouts/PrimaryLayout'
-import './app.scss'
+import './app.less'
 import { login, register } from './endpoints';
-import { Login } from './containers';
-// const Login = WrapperLoadable('./containers/Login/Login');
-const Registration = WrapperLoadable('./containers/Registration/Registration');
+
+import { Login, Register } from './containers';
 
 @observer
 export default class App extends React.Component {
@@ -21,16 +18,16 @@ export default class App extends React.Component {
         this.UserStore = UserStore;
     }
     render() {
-        const { loginStatus } = this.SessionStore;
+        const { authenticationStatus } = this.SessionStore;
         const role = this.UserStore.role || 'non-user';
         return (
             <Router>
                 <Layout>
                     <Route>
                         <Switch>
-                            <Route path="/login" component={Login} />
-                            {/* <WrapperRoute component={Login} opts={login} role={role} /> */}
-                            {/* <WrapperRoute component={Registration} opts={register} role={role} /> */}
+                            {/* <Route path="/login" component={Login} /> */}
+                            <WrapperRoute component={Login} opts={login} role={role} />
+                            {/* <WrapperRoute component={Register} opts={register} role={role} /> */}
                         </Switch>
                     </Route>
                 </Layout>

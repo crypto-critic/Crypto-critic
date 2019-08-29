@@ -1,15 +1,12 @@
 import { observable, action, computed, observe } from 'mobx';
-import { getUserInfo } from 'services/user.service';
-import SessionStore from 'stores/session.store';
+import { getUserInfo } from '../services/user.service';
+import SessionStore from '../stores/session.store';
 import { authorizationKey } from '../endpoints';
 
 class UserStore {
     constructor() {
         this.getUserInfo = getUserInfo;
-        observe(this, 'loginStatus', async () => {
-            const info = await this.getUserInfo(this.authorizationHeader);
-            this.set(info);
-        })
+        this.fetchData();
     }
 
     @observable email = '';
@@ -22,14 +19,25 @@ class UserStore {
 
     @observable dateCreated;
 
-    @computed get loginStatus() {
-        return SessionStore.loginStatus;
+    @computed get authenticationStatus() {
+        return SessionStore.authenticationStatus;
     }
 
     @computed get authorizationHeader() {
         return {
             [authorizationKey]: SessionStore.token
         }
+    }
+
+    @action fetchData = () => {
+        const headers = {
+            [authorizationKey]: SessionStore.token
+        }
+        this.getUserInfo(headers).then(({ data }) => {
+            const { email, firstName, lastName, avartar, dateCreated } = data;
+            console.log('firstName: ', firstName);
+            console.log('email: ', email);
+        });       
     }
 
     @action set = ({ newValue }) => {

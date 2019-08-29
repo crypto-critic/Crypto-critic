@@ -12,7 +12,7 @@ import GlobalStore from '../../stores/global.store';
 import SessionStore from '../../stores/session.store';
 import UserStore from '../../stores/user.store';
 import { languageDefinition, logoPath } from '../../config';
-const { SubMenu } = Menu
+const { SubMenu } = Menu;
 
 @withI18n()
 @observer
@@ -36,45 +36,47 @@ export default class Header extends Component {
 
     render() {
         const { money, moneys, language, languages, theme } = this.globalStore;
-        const { loginStatus } = this.sessionStore;
+        const { authenticationStatus } = this.sessionStore;
         const { email, firstName, avatar } = this.userStore;
 
         const leftContent = [
-            <Fragment>
+            <div>
                 <img className="logo" src={logoPath}/>
                 <Divider type="vertical" className="divider"/>
-            </Fragment>
+            </div>
         ]
-        const rightContent = loginStatus === 'AUTHENTICATED' ? [
-            <Menu key="user" mode="horizontal" onClick={this.handleLogout}>
-                <SubMenu
-                title={
-                    <Fragment>
-                        <span style={{ color: '#999', marginRight: 4 }}>
-                        <Trans>Hi,</Trans>
-                        </span>
-                        <span>{firstName}</span>
-                    <Avatar style={{ marginLeft: 8 }} src={avatar} />
-                  </Fragment>
-                }
-                >
-                    <Menu.Item key="SignOut">
-                        <Trans>Sign out</Trans>
-                    </Menu.Item>
-                </SubMenu>
-            </Menu>
-        ] : [
+        const rightContent = authenticationStatus !== 'AUTHENTICATED' ? 
+        // [
+        //     <Menu key="user" mode="horizontal" onClick={this.handleLogout}>
+        //         <SubMenu
+        //         title={
+        //             <Fragment>
+        //                 <span style={{ color: '#999', marginRight: 4 }}>
+        //                 <Trans>Hi,</Trans>
+        //                 </span>
+        //                 <span>{firstName}</span>
+        //             <Avatar style={{ marginLeft: 8 }} src={avatar} />
+        //           </Fragment>
+        //         }
+        //         >
+        //             <Menu.Item key="SignOut">
+        //                 <Trans>Sign out</Trans>
+        //             </Menu.Item>
+        //         </SubMenu>
+        //     </Menu>
+        // ] : 
+        [
             <Menu key="anonymos" mode="horizontal">
                 <Menu.Item>
                     <Tooltip
                         placement="bottom"
                         label={<Trans>Login</Trans>}
                     >
-                        <Link to="/login"><Icon type="login" /></Link>
+                        <Link to="/user/login"><Icon type="login" /></Link>
                     </Tooltip>
                 </Menu.Item>
             </Menu>
-        ]
+        ] : [<div>a</div>]
             
         const currentLanguage = languages.find(
             item => item.languageKey === language
@@ -126,12 +128,10 @@ export default class Header extends Component {
             </Dropdown>
         )
         return (
-            <Fragment>
-                <Layout.Header className="header" id="layoutHeader" >
-                    <div className="leftContainer">{leftContent}</div>
-                    <div className="rightContainer">{rightContent}</div>
-                </Layout.Header>
-            </Fragment>
+            <Layout.Header className="header" id="layoutHeader" >
+                <div className="leftContainer">{leftContent}</div>
+                <div className="rightContainer">{rightContent}</div>
+            </Layout.Header>
         );
     }
 }

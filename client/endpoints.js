@@ -1,5 +1,3 @@
-require('babel-polyfill')
-
 export const apiPrefix = `/api`;
 
 export const authorizationKey = 'Cryptocritic_token';
@@ -126,21 +124,3 @@ export const createEvent = {
     redirectPath: '/login',
     accessRoles: ['coin-owner', 'admin'],
 };
-
-// module.exports = {
-//     apiPrefix,
-//     authorizationKey,
-//     login,
-//     register,
-//     home,
-//     coin,
-//     explorer,
-//     userInfo,
-//     userWalletManagement,
-//     userEditor,
-//     userHistory,
-//     userTransfer,
-//     userEvent,
-//     userWithdraw,
-//     createEvent
-// }

@@ -7,13 +7,6 @@ const webpack = require('webpack');
 const gutil    = require('gulp-util');
 const notifier = require('node-notifier');
 
-// const babel = require('gulp-babel');
-// const babelConfig = require('./babel.config.js');
-// const Cache = require('gulp-file-cache')
-
-// const cache = new Cache();
-
-
 let devconfig = require('./config/webpack.config.dev.js');
 let statsLog = {
     colors: true,
