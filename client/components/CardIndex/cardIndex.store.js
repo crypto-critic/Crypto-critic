@@ -64,15 +64,8 @@ class CardIndexStore {
     @observable data = [];
 
     @action initData = async () => {
-        // const promise = this.arrayOfCoin.map( async coin => {
-        //     let title = coin.title;
-        //     let result = await getData(coin.id, this.money);
-        //     return await {...result, title};
-        // })
         let result0 = await getData(this.arrayOfCoin[0].id, this.money);
         this.data.push(result0)
-        // await Object.assign(this, {data});
-        // console.log(this.data)
     }
 
     @computed get newmoney() {

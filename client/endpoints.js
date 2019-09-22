@@ -1,6 +1,6 @@
 export const apiPrefix = `/api`;
 
-export const authorizationKey = 'Cryptocritic_token';
+export const authorizationKey = 'cryptocritic_token';
 
 export const login = {
     path: `/user/login`,
@@ -8,8 +8,8 @@ export const login = {
     icon: 'fas fa-sign-in-alt',
     component: 'containers/Login',
     accessRoles: ['non-user'],
-    redirectPath: '/404',
-    secondaryPath: '/users/me',
+    redirectPath: '/user/profile',
+    secondaryPath: '/user/profile',
 };
 
 export const register = {
@@ -19,7 +19,7 @@ export const register = {
     component: 'containers/Register',
     accessRoles: ['non-user'],
     redirectPath: '/404',
-    secondaryPath: '/users/login',
+    secondaryPath: '/user/login',
 };
 
 export const home = {
@@ -42,7 +42,7 @@ export const coin = {
 };
 
 export const explorer = {
-    path: '/explorer/:id',
+    path: '/explorer/:coinId',
     icon: 'search',
     redirectPath: '/',
     tittle: 'Explorer',
@@ -57,7 +57,7 @@ export const userInfo = {
     component: 'containers/UserInfo',
     accessRoles: ['user', 'coin-owner', 'admin'],
     redirectPath: '/404',
-    secondaryPath: '/users/login',
+    secondaryPath: '/user/login',
 };
 
 export const userWalletManagement = {
@@ -76,7 +76,7 @@ export const userEditor = {
     tittle: 'Edit Profile',
     icon: 'edit',
     component: 'containers/UserEditor',
-    redirectPath: '/login',
+    redirectPath: '/user/login',
     accessRoles: ['user', 'coin-owner', 'admin'],
 };
 
@@ -85,7 +85,7 @@ export const userTransfer = {
     tittle: 'Transfer',
     icon: 'fas fa-share-square',
     component: 'containers/UserEditor',
-    redirectPath: '/login',
+    redirectPath: '/user/login',
     accessRoles: ['user', 'coin-owner', 'admin'],
 };
 
@@ -94,7 +94,7 @@ export const userWithdraw = {
     tittle: 'Withdrawal',
     icon: 'wallet',
     component: 'containers/UserWithdraw',
-    redirectPath: '/login',
+    redirectPath: '/user/login',
     accessRoles: ['user', 'coin-owner', 'admin'],
 };
 
@@ -103,7 +103,7 @@ export const userHistory = {
     tittle: 'History',
     icon: 'history',
     component: 'containers/UserHistory',
-    redirectPath: '/login',
+    redirectPath: '/user/login',
     accessRoles: ['user', 'coin-owner', 'admin'],
 };
 
@@ -112,7 +112,7 @@ export const userEvent = {
     tittle: 'User Event',
     icon: 'far fa-calendar-alt',
     component: 'containers/UserEvent',
-    redirectPath: '/login',
+    redirectPath: '/user/login',
     accessRoles: ['user', 'coin-owner', 'admin'],
 };
 
@@ -121,6 +121,6 @@ export const createEvent = {
     tittle: 'Create Event',
     icon: 'far fa-calendar-plus',
     component: 'containers/CreateEvent',
-    redirectPath: '/login',
+    redirectPath: '/user/login',
     accessRoles: ['coin-owner', 'admin'],
 };

@@ -13,7 +13,7 @@ const languages = {
   en: en_US,
   vi: vi_VN
 }
-import './PrimaryLayout.scss'
+import './PrimaryLayout.less'
 
 const { Content } = Layout
 
@@ -31,10 +31,10 @@ class PrimaryLayout extends Component {
     const { globalStore, sessionStore, userStore } = this;
     const { children } = this.props;
     const { language, catalogs } = globalStore;
-    console.log('language: ', language);
     return (
       <ConfigProvider locale={languages[language]}>
         <I18nProvider language={language} catalogs={catalogs}>
+        <div className="layout">
           <Layout>
               <Header />
               <Content
@@ -42,9 +42,9 @@ class PrimaryLayout extends Component {
               >
                   {children}
               </Content>
-              <BackTop
-              />
+              <BackTop />
           </Layout>
+        </div>
         </I18nProvider>
       </ConfigProvider>
     )

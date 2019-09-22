@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react';
-import { observable, action } from 'mobx';
+import { observable, action, computed, observe } from 'mobx';
 import 'antd/dist/antd.less';
 import { Trans, withI18n } from '@lingui/react'
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
 import './login.less'
 import { SessionStore } from '../../stores';
+import { login } from '../../endpoints';
 
 @withI18n()
 @Form.create()
@@ -14,33 +15,48 @@ import { SessionStore } from '../../stores';
 class LoginForm extends React.Component {
   @observable submitted = false;
 
-  @action submit = () => this.submitted = true;
+  @action setSubmit = (value) => this.submitted = value;
+
+  @computed get authenticationStatus() {
+    return SessionStore.authenticationStatus;
+  }
+  @computed get loginMessage() {
+    return SessionStore.loginMessage;
+  }
 
   constructor(props) {
     super(props);
     this.sessionStore = SessionStore;
+    // observe(this, 'authenticationStatus', ({ newValue }) => {
+    //   console.log('newValue: ', newValue);
+    //   this.props.history.push(login.secondaryPath);
+    // })
   }
 
   handleSubmit = e => {
-    this.submit();
+    this.setSubmit(true);
     e.preventDefault();
     const { login, authenticationStatus } = this.sessionStore;
-    console.log('authenticationStatus: ', authenticationStatus);
     const { validateFieldsAndScroll } = this.props.form;
-    validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values);
-        login(values);
-        // authenticationStatus === 'AUTHENTICATED' && history.push('/home');
-      }
-    });
+    setTimeout(() => {
+      validateFieldsAndScroll((err, values) => {
+        if (!err) {
+          console.log('Received values of form: ', values);
+          login(values);
+        }
+      });
+      return this.setSubmit(false)
+    }, 2000)
   };
 
   render() {
     const { i18n, form: { getFieldDecorator } } = this.props;
-    const { submitted } = this;
+    const { submitted, loginMessage } = this;
     return (
-      <Form onSubmit={this.handleSubmit} className="login-form">
+      <Form
+      className="login-form"
+      >
+        {loginMessage && <div className={loginMessage.status}><Trans>{loginMessage.message}</Trans></div>}
         <Form.Item>
           {getFieldDecorator('email', {
             rules: [{ required: true, message: i18n.t`Please input your email!` }],
@@ -66,7 +82,6 @@ class LoginForm extends React.Component {
         <Form.Item>
           {getFieldDecorator('remember', {
             valuePropName: 'checked',
-            initialValue: true,
           })(<Checkbox><Trans>Remember me</Trans></Checkbox>)}
           <a className="login-form-forgot" href="">
             <Trans>Forgot password</Trans>
@@ -80,7 +95,7 @@ class LoginForm extends React.Component {
           >
             Log in
           </Button>
-          <Trans>Or <Link to="/register">register now!</Link></Trans>
+          <Trans>Or <Link to="/user/register">register now!</Link></Trans>
         </Form.Item>
       </Form>
     );

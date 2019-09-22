@@ -1,5 +1,5 @@
 const supportedCurrencySymbols = {
-    BTC: "Ƀ",
+    BTC: "₿",
     ETH: "Ξ",
     USD: "$",
     CAD: "C$",

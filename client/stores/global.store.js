@@ -6,7 +6,7 @@ const { languages, defaultLanguage } = languageDefinition;
 const { moneys, defaultMoney } = moneyDefinition;
 const { themes, defaultTheme } = themeDefinition;
 
-class GlobalStore {
+class GlobalStoreInit {
     constructor() {
         this.getValueFromLocalStorage = getValueFromLocalStorage;
         this.setValueToLocalStorage = setValueToLocalStorage;
@@ -53,6 +53,6 @@ class GlobalStore {
     }
 }
 
-const AppGlobalStore = new GlobalStore();
+const GlobalStore = new GlobalStoreInit();
 
-export default AppGlobalStore;
+export default GlobalStore;

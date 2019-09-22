@@ -11,7 +11,7 @@ import { UserStore } from '../stores';
 
 const { AUTHENTICATED, UNAUTHENTICATED, IDLE_TIME } = authenticationConstants;
 
-class SessionStore {
+class SessionStoreInit {
     constructor() {
         this.getValueFromLocalStorage = getValueFromLocalStorage;
         this.setValueToLocalStorage = setValueToLocalStorage;
@@ -23,6 +23,8 @@ class SessionStore {
     @observable authenticationStatus = UNAUTHENTICATED;
 
     @observable token = '';
+
+    @observable loginMessage = {};
 
     @computed get isIdle() {
         let idleTime = Number(this.getValueFromLocalStorage('actionTime')) + IDLE_TIME;
@@ -39,16 +41,17 @@ class SessionStore {
     }
 
     @action login = async (query) => {
-        const { email, password } = query;
-        let user = await this.loginService({ email, password });
-        if (user && user.token) {
-            this.authenticationStatus = AUTHENTICATED;
-            this.token = user.token
-            console.log('here')
-            this.setValueToLocalStorage({key: 'actionTime', value: Date.now() });
-            this.setValueToLocalStorage({key: authorizationKey, value: user.token});
-            UserStore.fetchData();
-        }
+        this.loginService(query).then(user => {
+            if (user.status === 'error') {
+                return this.loginMessage = user;
+            }            
+            if (user && user.token) {
+                this.token = user.token
+                this.setValueToLocalStorage({key: 'actionTime', value: Date.now() });
+                this.setValueToLocalStorage({key: authorizationKey, value: user.token});
+                this.authenticationStatus = AUTHENTICATED;
+            }
+        });
     }
     
     @action logout = () => {
@@ -64,6 +67,6 @@ class SessionStore {
     }
 }
 
-const AppSessionStore = new SessionStore();
+const SessionStore = new SessionStoreInit();
 
-export default AppSessionStore;
+export default SessionStore;

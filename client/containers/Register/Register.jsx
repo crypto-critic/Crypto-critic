@@ -1,6 +1,8 @@
 import React from 'react';
+import { observer } from 'mobx-react';
 import 'antd/dist/antd.less';
-import './register.less';
+import { observable, action, computed, observe } from 'mobx';
+import { Trans, withI18n } from '@lingui/react'
 import {
   Form,
   Input,
@@ -13,149 +15,223 @@ import {
   Checkbox,
   Button,
   AutoComplete,
+  Result
 } from 'antd';
+import RegisterStore from './register.store';
+import './register.less';
+
+import { Link } from 'react-router-dom';
 
 const { Option } = Select;
 const AutoCompleteOption = AutoComplete.Option;
 
+@withI18n()
 @Form.create()
+@observer
 class RegisterForm extends React.Component {
-  state = {
-    confirmDirty: false,
-    autoCompleteResult: [],
-  };
-
+  constructor(props) {
+    super(props);
+    this.store = RegisterStore;
+  }
+  
   handleSubmit = e => {
+    const { register, setProperties } = this.store;
+    const { validateFieldsAndScroll, setFieldsValue } = this.props.form;
     e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values);
-      }
-    });
+    setProperties({ registerStatus: 'loading' });
+    setTimeout(() => {
+      validateFieldsAndScroll((err, values) => {
+        if (!err) {
+          const { agreement } = values;
+          if (agreement && agreement === true) {
+            register(values);
+            return setFieldsValue({
+              email: '',
+              password: '',
+              password_confirm: '',
+              firstName: '',
+              lastName: '',
+              agreement: false
+            })
+          } else {
+            setProperties({ registerStatus: 'error' })
+            return setProperties({
+              message: {
+                status: 'error',
+                message: `Please read & accept agreement!`
+              }
+            })
+          }
+          return setProperties({ registerStatus: 'error' })
+        }
+        return setProperties({ registerStatus: 'error' })
+      });
+    }, 1000)
   };
 
   handleConfirmBlur = e => {
+    const { confirmDirty, setProperties } = this.store;
     const { value } = e.target;
-    this.setState({ confirmDirty: this.state.confirmDirty || !!value });
+    setProperties({ confirmDirty: confirmDirty || !!value });
   };
 
   compareToFirstPassword = (rule, value, callback) => {
-    const { form } = this.props;
-    if (value && value !== form.getFieldValue('password')) {
-      callback('Two passwords that you enter is inconsistent!');
+    const { getFieldValue } = this.props.form;
+    if (value && value !== getFieldValue('password')) {
+      callback(`Two passwords that you enter is inconsistent!`);
     } else {
       callback();
     }
   };
 
   validateToNextPassword = (rule, value, callback) => {
-    const { form } = this.props;
-    if (value && this.state.confirmDirty) {
-      form.validateFields(['confirm'], { force: true });
+    const { confirmDirty } = this.store;
+    const { validateFields } = this.props.form;
+    if (value && confirmDirty) {
+      validateFields(['confirm'], { force: true });
     }
     callback();
   };
 
-  render() {
-    const { getFieldDecorator } = this.props.form;
-    const { autoCompleteResult } = this.state;
+  handleOnclick = () => {
+    this.store.setProperties({
+      registerStatus: undefined,
+      message: {}
+    })
+  }
 
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 8 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 },
-      },
-    };
-    const tailFormItemLayout = {
-      wrapperCol: {
-        xs: {
-          span: 24,
-          offset: 0,
-        },
-        sm: {
-          span: 16,
-          offset: 8,
-        },
-      },
-    };
-    
+  render() {
+    const { i18n, form: { getFieldDecorator } } = this.props;
+    const { message, registerStatus } = this.store;
+    console.log('message: ', message);
+    const { submitted } = this;
+    if (registerStatus === 'success') {
+      return (
+        <Result
+          status="success"
+          title={i18n.t`Registration Successfully!`}
+          subTitle={i18n.t`Please go to your email to confirmation!`}
+          extra={[
+            <Link to="/"><Button type="primary" key="home" onClick={this.handleOnclick}><Trans>Home Page</Trans></Button></Link>,
+            <Link to="/user/login"><Button key="login" onClick={this.handleOnclick}><Trans>Login</Trans></Button></Link>,
+          ]}
+        />
+      )
+    }
     return (
       <Form
-        {...formItemLayout}
-        onSubmit={this.handleSubmit}
         className="register"
       >
-        <Form.Item label="Email">
+        {message && <div className={message.status}><Trans>{message.message}</Trans></div>}
+        <Form.Item>
           {getFieldDecorator('email', {
             rules: [
               {
                 type: 'email',
-                message: 'The input is not valid Email!',
+                message: <Trans>The input is not valid Email!</Trans>
               },
               {
                 required: true,
-                message: 'Please input your Email!',
+                message: <Trans>Please input your Email!</Trans>
               },
             ],
-          })(<Input />)}
+          })(
+            <Input
+              prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              placeholder={i18n.t`Email`}
+            />,
+          )}
         </Form.Item>
-        <Form.Item label="Password" hasFeedback>
+
+        <Form.Item hasFeedback>
           {getFieldDecorator('password', {
             rules: [
               {
                 required: true,
-                message: 'Please input your password!',
+                message: <Trans>Please input your password!</Trans>
+              },
+              {
+                min: 6,
+                message: <Trans>Password require at least 6 characters</Trans>
               },
               {
                 validator: this.validateToNextPassword,
               },
             ],
-          })(<Input.Password />)}
+          })(
+            <Input
+              prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              type="password"
+              placeholder={i18n.t`Password`}
+            />
+          )}
         </Form.Item>
-        <Form.Item label="Confirm Password" hasFeedback>
-          {getFieldDecorator('confirm', {
+
+        <Form.Item hasFeedback>
+          {getFieldDecorator('password_confirm', {
             rules: [
               {
                 required: true,
-                message: 'Please confirm your password!',
+                message: <Trans>Please confirm your password!</Trans>,
               },
               {
                 validator: this.compareToFirstPassword,
               },
             ],
-          })(<Input.Password onBlur={this.handleConfirmBlur} />)}
-        </Form.Item>
-        <Form.Item
-          label={
-            <span>
-              Nickname&nbsp;
-              <Tooltip title="What do you want others to call you?">
-                <Icon type="question-circle-o" />
-              </Tooltip>
-            </span>
-          }
-        >
-          {getFieldDecorator('nickname', {
-            rules: [{ required: true, message: 'Please input your nickname!', whitespace: true }],
-          })(<Input />)}
-        </Form.Item>
-        <Form.Item >
-          {getFieldDecorator('agreement', {
-            valuePropName: 'checked',
           })(
-            <Checkbox>
-              I have read the <a href="">agreement</a>
-            </Checkbox>,
+            <Input
+              prefix={<Icon type="copy" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              type="password"
+              placeholder={i18n.t`Password confirm`}
+              onBlur={this.handleConfirmBlur}
+            />
           )}
         </Form.Item>
-        <Form.Item >
-          <Button type="primary" htmlType="submit">
-            Register
+
+        <Form.Item>
+          {getFieldDecorator('firstName', {
+            rules: [
+              { required: true, message: <Trans>Please input your first name!</Trans>, whitespace: true },
+              { min: 3, message: <Trans>First Name require at least 3 characters</Trans> },
+            ],
+          })(
+            <Input
+              prefix={<Icon type="bars" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              placeholder={i18n.t`First Name`}
+            />
+          )}
+        </Form.Item>
+
+        <Form.Item>
+          {getFieldDecorator('lastName')(
+            <Input
+              prefix={<Icon type="bars" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              placeholder={i18n.t`Last Name`}
+            />
+          )}
+        </Form.Item>
+
+        <Form.Item>
+          {getFieldDecorator('agreement', {
+            valuePropName: 'checked',
+            rules: [
+              { required: true, message: <Trans>Please read accept agreement</Trans> },
+            ]
+          })(
+            <Checkbox>
+              <Trans>I have read the <Link to="/user/agreement">agreement!</Link></Trans>
+            </Checkbox>,
+          )}
+          <Button
+            onClick={this.handleSubmit}
+            type="primary"
+            htmlType="submit"
+            className="register-form-button"
+            loading={registerStatus === 'loading'}
+          >
+            <Trans>Register</Trans>
           </Button>
+          <Trans>Or <Link to="/user/login" ><button className="login-button" onClick={this.handleOnclick}>login now!</button></Link></Trans>
         </Form.Item>
       </Form>
     );

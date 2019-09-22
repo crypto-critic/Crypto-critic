@@ -2,25 +2,45 @@ import { observable, action, computed, observe } from 'mobx';
 import { getUserInfo } from '../services/user.service';
 import SessionStore from '../stores/session.store';
 import { authorizationKey } from '../endpoints';
+import { authenticationConstants } from '../constants/globalConstants';
 
-class UserStore {
-    constructor() {
-        this.getUserInfo = getUserInfo;
-        this.fetchData();
+const { AUTHENTICATED, UNAUTHENTICATED } = authenticationConstants;
+
+class UserStoreInit {
+    static initialState = {
+        email: '',
+        firstName: '',
+        lastName: '',
+        avartar: '',
+        dateCreated: undefined,
+        role: undefined
     }
 
-    @observable email = '';
+    constructor() {
+        this.getUserInfo = getUserInfo;
+        this.initData();
+        observe(this, 'authenticationStatus', ({ newValue }) => {
+            if (newValue === AUTHENTICATED) {
+                return this.fetchData()
+            }
+            return this.resetData();            
+        })
+    }
 
-    @observable firstName = '';
+    @observable email;
 
-    @observable lastName = '';
+    @observable firstName;
 
-    @observable avartar = '';
+    @observable lastName;
+
+    @observable avartar;
 
     @observable dateCreated;
 
+    @observable role;
+
     @computed get authenticationStatus() {
-        return SessionStore.authenticationStatus;
+        return SessionStore.authenticationStatus || UNAUTHENTICATED;
     }
 
     @computed get authorizationHeader() {
@@ -29,22 +49,36 @@ class UserStore {
         }
     }
 
-    @action fetchData = () => {
-        const headers = {
-            [authorizationKey]: SessionStore.token
+    @action initData = () => {
+        if (this.authenticationStatus === AUTHENTICATED) {
+            return this.fetchData();
         }
-        this.getUserInfo(headers).then(({ data }) => {
-            const { email, firstName, lastName, avartar, dateCreated } = data;
-            console.log('firstName: ', firstName);
-            console.log('email: ', email);
-        });       
+        this.resetData();
     }
 
-    @action set = ({ newValue }) => {
-        Object.assign(this, { newValue });
+    @action fetchData = () => {
+        this.getUserInfo(this.authorizationHeader).then(data => {
+            const { email, firstName, lastName, avartar, dateCreated, role } = data;
+            this.setProperties({
+                email,
+                firstName,
+                lastName,
+                avartar,
+                dateCreated,
+                role
+            })    
+        });
+    }
+
+    @action resetData = () => {
+        this.setProperties(UserStoreInit.initialState);
+    }
+
+    @action setProperties = (newValue) => {
+        Object.assign(this, newValue);
     }
 }
 
-const AppUserStore = new UserStore();
+const UserStore = new UserStoreInit();
 
-export default AppUserStore;
+export default UserStore;
