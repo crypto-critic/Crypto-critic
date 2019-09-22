@@ -1,69 +1,30 @@
-import React from 'react';
-import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
-// import {AppLayout} from './components/AppLayout'
-import { connect } from 'react-redux';
-
-import {LoginPage} from "./components/LoginPage";
-import {RegisterPage} from "./components/RegisterPage";
-import HomePage from './components/HomePage/HomePage';
-import AgTable from './components/AgTable/AgTable2'
-
-// import Loadable from "react-loadable";
-// const LoginPage = Loadable({
-//     loader: () =>
-//         import("./LoginPage"),
-//     loading: () => null
-// });
-// const RegisterPage = Loadable({
-//     loader: () =>
-//         import("./RegisterPage"),
-//     loading: () => null
-// });
-const UserRoute = ({ component: Component, logInState, ...rest }) => (
-    <Route {...rest} render={props => (
-        logInState === 'SUCCESS'
-            ? <Component {...props} />
-            : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
-    )} />
-);
-const AnynomousRoute = ({ component: Component, logInState, ...rest }) => (
-    <Route {...rest} render={props => (
-        logInState !== 'SUCCESS'
-            ? <Component {...props} />
-            : <Redirect to={{ pathname: '/', state: { from: props.location } }} />
-    )} />
-);
-
-export class App1 extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+import React, { Fragment } from 'react';
+import { Redirect, BrowserRouter, Route, Switch } from 'react-router-dom';
+import { observer, inject } from 'mobx-react';
+import { WrapperRoute } from './components';
+import Layout from './layouts/PrimaryLayout'
+import './app.less'
+import { login, register, home, coin, explorer } from './endpoints';
+import { Login, Register, HomePage, CoinPage, ExplorerPage } from './containers';
+import UserStore from './services/user.service';
+@inject(stores => stores)
+@observer
+export default class App extends React.Component {
     render() {
-        const {user} = this.props;
-        let context = (
-            <Switch>
-                <UserRoute exact path="/" logInState={user.state} component={HomePage} />
-                <AnynomousRoute path="/login" logInState={user.state} component={LoginPage} />
-                <AnynomousRoute path="/register" logInState={user.state} component={RegisterPage} />
-                <Route exact path="/home" component={HomePage} />
-                {/* <Route exact path="/table" component={AgTable} /> */}
-            </Switch>
-        );
+        const { authenticationStatus } = this.props.sessionStore;
+        const role = this.props.userStore.role || 'non-user';
         return (
-            <div>
-                {context}
-                {/* <AppLayout children={context}/> */}
-            </div>
+            <BrowserRouter>
+                <Switch>
+                    <Layout>
+                        <WrapperRoute component={Login} opts={login} role={role}/>
+                        <WrapperRoute component={Register} opts={register} role={role}/>
+                        <WrapperRoute component={HomePage} opts={home} role={role} exact/>
+                        <WrapperRoute component={CoinPage} opts={coin} role={role} />
+                        <WrapperRoute component={ExplorerPage} opts={explorer} role={role} />
+                    </Layout>
+                </Switch>
+            </BrowserRouter>
         );
     }
 }
-const withRouterApp = withRouter(App1);
-
-function mapStateToProps(state) {
-    return {
-        user: state.authentication
-    };
-}
-
-const connectedApp = connect(mapStateToProps)(withRouterApp);
-export { connectedApp as App };

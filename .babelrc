@@ -10,21 +10,19 @@
         ]
       }
     }],
-    "@babel/react"
+    "@babel/react",
+    "@lingui/babel-preset-react"
   ],
   "plugins": [
-    ["@babel/transform-runtime"],
-    "@babel/plugin-proposal-class-properties",
+    ["@babel/plugin-proposal-decorators", { "legacy": true}],
+    ["@babel/plugin-proposal-class-properties", { "loose": true}],
+    "@babel/transform-runtime",
     "@babel/plugin-proposal-export-default-from",
     "@babel/plugin-syntax-dynamic-import",
-    ["lodash", {"id": ["lodash", "semantic-ui-react"]}]
+    "transform-class-properties",
+    ["import", { "libraryName": "antd", "libraryDirectory": "lib", "style": "css"}]
   ],
   "env": {
-    "development": {
-      "plugins": [
-        "react-hot-loader/babel"
-      ]
-    },
     "production": {
       "plugins": [
         "transform-react-remove-prop-types"
@@ -32,3 +30,4 @@
     }
   }
 }
+
