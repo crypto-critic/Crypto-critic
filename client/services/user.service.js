@@ -1,94 +1,25 @@
-import { authHeader } from '../services';
+import { apiPrefix, userInfo } from '../endpoints';
+import axios from 'axios';
+import http from './http';
 
-export const userService = {
-    login,
-    logout,
-    register,
-    getAll,
-    getById,
-    update,
-    delete: _delete
-};
-
-function login(email, password) {
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+export const getUserInfo = (headers) => new Promise((res, rej) => {
+    const opts = {
+        method: 'get',
+        headers,
+        url: apiPrefix + userInfo.path
     };
-    return fetch(`api/users/login`, requestOptions)
-        .then(handleResponse)
-        .then(user => {
-            // store user details and jwt token in local storage to keep user logged in between page refreshes
-            // localStorage.setItem('user', JSON.stringify(user));
-            // const decoded = jwt_decode(user);
-            // console.log(decoded);
-            return user;
-        });
-}
+    axios(opts)
+        .then(result => res(result.data))
+        .catch(err => rej(err))
+});
 
-function logout() {
-    localStorage.removeItem('User.js');
-}
+// const email = 'son1234'
+// const password = 'son1234'
 
-function getAll() {
-    const requestOptions = {
-        method: 'GET',
-        headers: authHeader()
-    };
-
-    return fetch(`api/users`, requestOptions).then(handleResponse);
-}
-
-function getById(id) {
-    const requestOptions = {
-        method: 'GET',
-        headers: authHeader()
-    };
-    return fetch(`api/users/${id}`, requestOptions).then(handleResponse);
-}
-
-function register(user) {
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user)
-    };
-    return fetch(`api/users/register`, requestOptions).then(handleResponse);
-}
-
-function update(user) {
-    const requestOptions = {
-        method: 'PUT',
-        headers: { ...authHeader(), 'Content-Type': 'application/json' },
-        body: JSON.stringify(user)
-    };
-
-    return fetch(`api/users/${user.id}`, requestOptions).then(handleResponse);;
-}
-
-// prefixed function name with underscore because delete is a reserved word in javascript
-function _delete(id) {
-    const requestOptions = {
-        method: 'DELETE',
-        headers: authHeader()
-    };
-
-    return fetch(`api/users/${id}`, requestOptions).then(handleResponse);
-}
-
-function handleResponse(response) {
-    return response.text().then(text => {
-        const data = text && JSON.parse(text);
-        if (!response.ok) {
-            if (response.status === 401) {
-                // auto logout if 401 response returned from api
-                logout();
-                location.reload(true);
-            }
-            const error = (data && data.message) || response.statusText;
-            return Promise.reject(error);
-        }
-        return data;
-    });
-}
+//     http.client.authenticate({
+//         stragety: 'local',
+//         accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJpYXQiOjE1Njg5NTM1MjMsImV4cCI6MTU2OTAzOTkyMywiYXVkIjoiaHR0cHM6Ly95b3VyZG9tYWluLmNvbSIsImlzcyI6ImZlYXRoZXJzIiwic3ViIjoiNWQ4M2JlNGI2NmUzOTk2Yzk2MWNiYzAzIiwianRpIjoiZjFjN2EzYTktZmYyZS00ZDE1LTg0NzgtN2JlYzA4MDFlNjcyIn0.0d9U8kb6QFv62Xu1WtkbtX3pZGRLi8NRAl-7gd-ANZw'
+//     }).then((data) => {
+//     // console.log('data: ', data);
+// })
+http.client.service('users').find().then(data => console.log('users: ', data))
