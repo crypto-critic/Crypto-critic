@@ -13,6 +13,7 @@ export default class App extends React.Component {
     render() {
         const { authenticationStatus } = this.props.sessionStore;
         const role = this.props.userStore.role || 'non-user';
+        console.log('tttt')
         return (
             <BrowserRouter>
                 <Switch>
