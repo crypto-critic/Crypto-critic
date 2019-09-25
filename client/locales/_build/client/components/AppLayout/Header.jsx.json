@@ -1,0 +1,26 @@
+{
+  "Hi,": {
+    "origin": [
+      [
+        "client/components/AppLayout/Header.jsx",
+        54
+      ]
+    ]
+  },
+  "Sign out": {
+    "origin": [
+      [
+        "client/components/AppLayout/Header.jsx",
+        62
+      ]
+    ]
+  },
+  "Login": {
+    "origin": [
+      [
+        "client/components/AppLayout/Header.jsx",
+        71
+      ]
+    ]
+  }
+}
