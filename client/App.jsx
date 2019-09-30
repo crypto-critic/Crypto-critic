@@ -4,9 +4,10 @@ import { observer, inject } from 'mobx-react';
 import { WrapperRoute } from './components';
 import Layout from './layouts/PrimaryLayout'
 import './app.less'
-import { login, register, home, coin, explorer } from './endpoints';
+import {login, register, home, coin, explorer, coinInfo} from './endpoints';
 import { Login, Register, HomePage, CoinPage, ExplorerPage } from './containers';
 import UserStore from './services/user.service';
+import {CoinInfo} from "./containers/Coin-Info/coin-info";
 @inject(stores => stores)
 @observer
 export default class App extends React.Component {
@@ -22,6 +23,7 @@ export default class App extends React.Component {
                         <WrapperRoute component={Register} opts={register} role={role}/>
                         <WrapperRoute component={HomePage} opts={home} role={role} exact/>
                         <WrapperRoute component={CoinPage} opts={coin} role={role} />
+                        <WrapperRoute component={CoinInfo} opts={coinInfo} role={role} />
                         <WrapperRoute component={ExplorerPage} opts={explorer} role={role} />
                     </Layout>
                 </Switch>

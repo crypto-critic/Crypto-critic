@@ -11,7 +11,14 @@ export const login = {
     redirectPath: '/user/profile',
     secondaryPath: '/user/profile',
 };
-
+export const coinInfo ={
+    path : '/coin-info/:id',
+    tittle: 'Coin Info',
+    icon: 'fas fa-coins',
+    component: 'containers/Coin-Info',
+    accessRoles: ['non-user', 'user', 'coin-owner', 'admin'],
+    redirectPath: '/',
+}
 export const register = {
     path: `/user/register`,
     tittle: 'Register',
