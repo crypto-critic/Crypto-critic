@@ -16,25 +16,36 @@ class HomePage extends React.Component {
     }
 
     render() {
-        const { masternodeColumns, masternodeDataTable, masternodeTableLoading } = this.masternodeTabStore;
-        const { cryptocurrencyColumns, cryptocurrencyDataTable, handleTableChange, cryptocurrencyTableLoading } = this.cryptocurrencyTabStore;
+        const {
+            masternodeColumns,
+            masternodeDataTable,
+            handleTableChange : handleMnTableChange,
+            masternodeTableLoading,
+        } = this.masternodeTabStore;
+        const {
+            cryptocurrencyColumns,
+            cryptocurrencyDataTable,
+            handleTableChange: handleCryptoTableChange,
+            cryptocurrencyTableLoading
+        } = this.cryptocurrencyTabStore;
         return (
             <Tabs defaultActiveKey="1" className="coins-tab">
                 <TabPane tab="Cryptocurrencys" key="1">
                 <Table
                         className="ranking-table"
                         columns={cryptocurrencyColumns}
-                        dataSource={cryptocurrencyDataTable}
-                        onChange={handleTableChange}
                         loading={cryptocurrencyTableLoading}
+                        dataSource={cryptocurrencyDataTable}
+                        onChange={handleCryptoTableChange}
                     />
                 </TabPane>
                 <TabPane tab="Masternodes" key="2">
                     <Table
                         className="ranking-table"
                         columns={masternodeColumns}
-                        dataSource={masternodeDataTable}
                         loading={masternodeTableLoading}
+                        dataSource={masternodeDataTable}
+                        onChange={handleMnTableChange}
                     />
                 </TabPane>
                 <TabPane tab="IEOs" key="3">

@@ -1,12 +1,12 @@
 /**
  * @author locnt3
  */
-import feathers from './http';
+import rest from '../transporter/rest';
 
-export class CollectionService {
+export default class CollectionRestService {
 	constructor({ service }) {
 		this.service = service;
-		this.client = feathers.client;
+		this.client = rest.client;
 	}
 
 	find = (params) => this.client.service(this.service).find(params);

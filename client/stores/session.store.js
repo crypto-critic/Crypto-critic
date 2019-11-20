@@ -1,69 +1,64 @@
 import { observable, action, computed } from 'mobx';
-import {
-    getValueFromLocalStorage,
-    setValueToLocalStorage,
-    removeKeyFromLocalStorage
-} from '../services/localStorage.service';
-import { loginService } from '../services/authentication.service';
-import { authorizationKey } from '../endpoints';
-import { authenticationConstants } from '../constants/globalConstants';
-import { UserStore } from '../stores';
+import Rest from '../transporter/rest';
+// import Socket from '../transporter/socket';
+// import { UserStore } from '../stores';
 
+import { authenticationConstants } from '../constants/global.constant';
 const { AUTHENTICATED, UNAUTHENTICATED, IDLE_TIME } = authenticationConstants;
 
 class SessionStoreInit {
     constructor() {
-        this.getValueFromLocalStorage = getValueFromLocalStorage;
-        this.setValueToLocalStorage = setValueToLocalStorage;
-        this.removeKeyFromLocalStorage = removeKeyFromLocalStorage;
-        this.loginService = loginService;
+        this.restClient = Rest.client;
+        // this.socketClient = Socket.client;
         this.initData();
     }
 
-    @observable authenticationStatus = UNAUTHENTICATED;
+    @observable authenticationStatus;
 
-    @observable token = '';
+    @observable user;
 
-    @observable loginMessage = {};
-
-    @computed get isIdle() {
-        let idleTime = Number(this.getValueFromLocalStorage('actionTime')) + IDLE_TIME;
-        return idleTime && idleTime > Date.now()
-    }
+    @observable loginError;
 
     @action initData = () => {
-        this.token = this.getValueFromLocalStorage(authorizationKey);
-        if (this.token && this.isIdle) {
-            this.authenticationStatus = AUTHENTICATED;
-            return;
-        }
-        this.logout();
+        this.restClient.authenticate()
+            .then((data) => {
+                const { user } = data;
+                Object.assign(this, { user });
+                this.authenticationStatus = AUTHENTICATED;
+            })
+            .catch(() => {
+                this.authenticationStatus = UNAUTHENTICATED;
+                return;
+            })
     }
 
-    @action login = async (query) => {
-        this.loginService(query).then(user => {
-            if (user.status === 'error') {
-                return this.loginMessage = user;
-            }            
-            if (user && user.token) {
-                this.token = user.token
-                this.setValueToLocalStorage({key: 'actionTime', value: Date.now() });
-                this.setValueToLocalStorage({key: authorizationKey, value: user.token});
-                this.authenticationStatus = AUTHENTICATED;
-            }
+    @action login = (query) => {
+        return this.restClient.authenticate({
+            strategy: 'local',
+            ...query,
+        }).then(data => {
+            const { user } = data;
+            Object.assign(this, { user });
+            this.authenticationStatus = AUTHENTICATED;
+        }).catch((err) => {
+            this.setProperties({
+                loginError: err,
+            })
         });
     }
     
     @action logout = () => {
-        Object.assign(this, {
-            authenticationStatus: UNAUTHENTICATED,
-            token: '',
-        })
-        this.removeKeyFromLocalStorage(authorizationKey);
+        this.restClient.logout();
+        this.user = undefined;
+        this.authenticationStatus = UNAUTHENTICATED;
     }
 
-    @action resetActionTime = () => {
-        this.setValueToLocalStorage('actionTime', Date.now());
+    @action handleChange = () => {
+        this.setProperties({ loginError: {} })
+    }
+
+    @action setProperties = (newValue) => {
+        Object.assign(this, newValue);
     }
 }
 

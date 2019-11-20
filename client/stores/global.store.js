@@ -1,7 +1,6 @@
 import { observable, action, computed, observe } from 'mobx';
-import { getValueFromLocalStorage, setValueToLocalStorage } from '../services/localStorage.service';
 import { languageDefinition, moneyDefinition, themeDefinition } from '../config';
-
+import { getValueFromLocalStorage, setValueToLocalStorage } from '../services/localStorage.service';
 const { languages, defaultLanguage } = languageDefinition;
 const { moneys, defaultMoney } = moneyDefinition;
 const { themes, defaultTheme } = themeDefinition;

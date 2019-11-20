@@ -2,7 +2,7 @@ import { observable, action, computed, observe } from 'mobx';
 import { getUserInfo } from '../services/user.service';
 import SessionStore from '../stores/session.store';
 import { authorizationKey } from '../endpoints';
-import { authenticationConstants } from '../constants/globalConstants';
+import { authenticationConstants } from '../constants/global.constant';
 
 const { AUTHENTICATED, UNAUTHENTICATED } = authenticationConstants;
 
@@ -12,7 +12,7 @@ class UserStoreInit {
         firstName: '',
         lastName: '',
         avartar: '',
-        dateCreated: undefined,
+        createdAt: undefined,
         role: undefined
     }
 
@@ -35,7 +35,7 @@ class UserStoreInit {
 
     @observable avartar;
 
-    @observable dateCreated;
+    @observable createdAt;
 
     @observable role;
 

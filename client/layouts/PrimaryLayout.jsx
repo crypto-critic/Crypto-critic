@@ -3,7 +3,7 @@ import { BackTop, Layout, Drawer, ConfigProvider } from 'antd';
 import { I18nProvider } from '@lingui/react';
 import GlobalStore from '../stores/global.store';
 import SessionStore from '../stores/session.store';
-import UserStore from '../stores/user.store';
+// import UserStore from '../stores/user.store';
 import { Header } from '../components';
 import { observer } from 'mobx-react';
 import en_US from 'antd/lib/locale-provider/en_US';
@@ -23,12 +23,12 @@ class PrimaryLayout extends Component {
       super(props);
       this.globalStore = GlobalStore;
       this.sessionStore = SessionStore;
-      this.userStore = UserStore
+      // this.userStore = UserStore
   }
   
 
   render() {
-    const { globalStore, sessionStore, userStore } = this;
+    const { globalStore, sessionStore, /* userStore */} = this;
     const { children } = this.props;
     const { language, catalogs } = globalStore;
     return (

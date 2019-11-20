@@ -1,6 +1,6 @@
 export const siteName = 'Crypto Critic'
 export const copyright = 'Crypto Critic ©2019 pinokara'
-export const logoPath = '../../assets/img/logo.svg'
+export const logoPath = '../../assets/img/logo2.png'
 export const languageDefinition = {
   /* Countrys flags: https://www.flaticon.com/packs/countrys-flags */
   languages: [
@@ -23,12 +23,12 @@ export const languageDefinition = {
   defaultLanguage: 'en',
 }
 export const moneyDefinition = {
-  defaultMoney: 'USD',
+  defaultMoney: 'usd',
   moneys: [
-    'USD',
-    'VND',
-    'BTC',
-    'JPY'
+    'usd',
+    'vnd',
+    'btc',
+    'jpy'
   ]
 }
 export const themeDefinition = {
@@ -41,8 +41,7 @@ export const themeDefinition = {
 
 export const appConfig = {
 	host: 'localhost',
-	// host: '125.212.239.134',
-	port: 3030,
+	port: 3333,
 	token: {
 		minValidity: 5
 	},

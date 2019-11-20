@@ -103,7 +103,6 @@ class RegisterForm extends React.Component {
   render() {
     const { i18n, form: { getFieldDecorator } } = this.props;
     const { message, registerStatus } = this.store;
-    console.log('message: ', message);
     const { submitted } = this;
     if (registerStatus === 'success') {
       return (

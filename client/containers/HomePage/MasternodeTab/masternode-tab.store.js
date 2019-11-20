@@ -4,7 +4,7 @@ import { Input, Button, Icon, Avatar, Tag } from 'antd';
 import { Link } from 'react-router-dom';
 import Highlighter from 'react-highlight-words';
 import { GlobalStore } from '../../../stores';
-import { getMasternodeData } from '../../../services/homePage.service';
+import { coinService } from '../../../services/homePage.service';
 import { formatCurrency } from '../../../services/formatCurrency.service';
 
 const getColumnSearchProps = dataIndex => ({
@@ -59,12 +59,11 @@ const getColumnSearchProps = dataIndex => ({
 
 class MasternodeTabStore {
     constructor() {
-        this.getMasternodeData = getMasternodeData;
+        this.coinService = coinService;
         this.getColumnSearchProps = getColumnSearchProps;
         this.initData();
-        observe(this, 'money', (newValue) => {
-            this.initData(newValue);
-        })
+        observe(this, 'money', this.initData);
+        observe(this, 'tableQuery', this.initData);
     }
 
     @computed get money() {
@@ -77,11 +76,34 @@ class MasternodeTabStore {
 
     @observable masternodeDataTable = undefined;
 
+    @observable tableQuery = {};
+
     @action
     initData = () => {
-        this.setProperties({ masternodeTableLoading: true })
-        this.getMasternodeData(this.money).then((result) => {
-            this.masternodeDataTable = result;
+        this.setProperties({
+            masternodeTableLoading: true,
+            masternodeDataTable: []
+        })
+        this.coinService.find({
+            query: {
+                ...this.tableQuery,
+                $select: [
+                    `name`,
+                    `symbol`,
+                    'image',
+                    `marketData.currentPrice.${this.money}`,
+                    `marketData.marketCap.${this.money}`,
+                    `marketData.totalVolume.${this.money}`,
+                    `marketData.priceChangePercentage24h.${this.money}`,
+                    `incomeData.ROI`,
+                    `incomeData.dailyIncome.${this.money}`,
+                    `incomeData.weeklyIncome.${this.money}`,
+                    `incomeData.monthlyIncome.${this.money}`,
+                    `incomeData.yearlyIncome.${this.money}`,
+                ]
+            }
+        }).then((result) => {
+            this.masternodeDataTable = result.data;
             this.setProperties({ masternodeTableLoading: false })
         })
     }
@@ -91,80 +113,118 @@ class MasternodeTabStore {
             [
                 {
                     title: 'Coin',
-                    dataIndex: 'id',
-                    key: 'id',
+                    dataIndex: 'coinId',
+                    key: 'coinId',
                     render: (text, record) => (
-                        <div><Avatar className="coin-logo" size="small" src={record.image}/><Link to={{
-                            pathname:`/explorer/${record.id}`,
+                        <div><Avatar className="coin-logo" size="small" src={record.image.small}/><Link to={{
+                            pathname:`/explorer/${record.symbol}`,
                             query: {
                                 name: record.name,
-                                image: record.image
+                                image: record.image.small
                             }
                         }}> {record.name}</Link></div>
                     ),
+                    sorter: true,
                     ...this.getColumnSearchProps
                 },
                 {
                     title: 'Price',
-                    dataIndex: 'current_price',
-                    key: 'current_price',
+                    dataIndex: 'marketData.currentPrice',
+                    key: 'currentPrice',
                     render: (data) => (
-                        <div>{formatCurrency(data, this.money)}</div>
+                        <div>{formatCurrency(data[this.money], this.money)}</div>
                     ),
-                    ...this.getColumnSearchProps
+                    sorter: true,
+                    ...getColumnSearchProps
                 },
                 {
                     title: 'Change',
-                    dataIndex: 'price_change_percentage_24h',
-                    key: 'price_change_percentage_24h',
+                    dataIndex: 'marketData.priceChangePercentage24h',
+                    key: 'priceChangePercentage24h',
                     render: (data) => (
-                        <Tag color={data > 0 ? "green" : "volcano"}>
-                            {data > 0 ? `+${data.toFixed(2)}%` : `${data.toFixed(2)}%`}
+                        <Tag color={data[this.money] > 0 ? "green" : "volcano"}>
+                            {data > 0 ? `+${data[this.money].toFixed(2)}%` : `${data[this.money].toFixed(2)}%`}
                         </Tag>
                     ),
+                    sorter: true,
                     ...this.getColumnSearchProps
                 },
                 {
                     title: 'Volume',
-                    dataIndex: 'total_volume',
-                    key: 'total_volume',
+                    dataIndex: 'marketData.totalVolume',
+                    key: 'totalVolume',
                     render: (data) => (
-                        <div>{formatCurrency(data, this.money)}</div>
+                        <div>{formatCurrency(data[this.money], this.money)}</div>
                     ),
+                    sorter: true,
                     ...this.getColumnSearchProps
                 },
                 {
                     title: 'Market Cap',
-                    dataIndex: 'market_cap',
-                    key: 'market_cap',
+                    dataIndex: 'marketData.marketCap',
+                    key: 'marketCap',
                     render: (data) => (
-                        <div>{formatCurrency(data, this.money)}</div>
+                        <div>{formatCurrency(data[this.money], this.money)}</div>
                     ),
+                    sorter: true,
                     ...this.getColumnSearchProps
                 },
                 {
                     title: 'ROI',
-                    dataIndex: 'ROI',
+                    dataIndex: 'incomeData.ROI',
                     key: 'ROI',
                     render: (data) => (
                         <Tag color="blue">
-                            {`${data}%`}
+                            {`${data.toFixed(2)}%`}
                         </Tag>
                     ),
+                    sorter: true,
                     ...this.getColumnSearchProps
                 },
                 {
                     title: 'Daily Income',
-                    dataIndex: 'dailyIncome',
+                    dataIndex: 'incomeData.dailyIncome',
                     key: 'dailyIncome',
                     render: (data) => (
-                        <div>{formatCurrency(data, this.money)}</div>
+                        <div>{formatCurrency(data[this.money], this.money)}</div>
                     ),
+                    sorter: true,
                     ...this.getColumnSearchProps
-                }
+                },
+                // {
+                //     title: 'Weekly Income',
+                //     dataIndex: 'incomeData.weeklyIncome',
+                //     key: 'weeklyIncome',
+                //     render: (data) => (
+                //         <div>{formatCurrency(data[this.money], this.money)}</div>
+                //     ),
+                //     sorter: true,
+                //     ...this.getColumnSearchProps
+                // },
+                // {
+                //     title: 'Yearly Income',
+                //     dataIndex: 'incomeData.yearlyIncome',
+                //     key: 'yearlyIncome',
+                //     render: (data) => (
+                //         <div>{formatCurrency(data[this.money], this.money)}</div>
+                //     ),
+                //     sorter: true,
+                //     ...this.getColumnSearchProps
+                // }
             ]
         )
     }
+
+    @action handleTableChange = (pagination, filters, sorter) => {
+            const { order, field } = sorter;
+            if (field) {
+                this.setProperties({
+                    tableQuery: {
+                        $sort: { [field]: order === 'ascend'? 1 : (order === 'descend' ? -1 : 0) }
+                    }
+                })
+            }
+        };
 
     @action setProperties = (newValue) => {
         Object.assign(this, newValue);

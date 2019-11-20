@@ -1,10 +1,10 @@
 import { observable, action, computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { registerService } from '../../services/authentication.service';
+import { userService } from '../../services/user.service';
 
 class RegisterStore {
     constructor() {
-        this.registerService = registerService;
+        this.userService = userService;
     }
 
     @observable registerStatus = undefined;
@@ -14,7 +14,7 @@ class RegisterStore {
     @observable message = {};
 
     @action register = (user) => {
-        this.registerService(user).then((result) => {
+        this.userService.create(user).then((result) => {
             if (result.status === 'success') {
                 this.registerStatus = 'success';
             } else {
@@ -26,7 +26,6 @@ class RegisterStore {
 
     @action setProperties = (newValue) => {
         Object.assign(this, newValue)
-        console.log('setproperties', newValue)
     }
 }
 

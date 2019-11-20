@@ -2,12 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { observable, action, computed, observe } from 'mobx';
-import 'antd/dist/antd.less';
 import { Trans, withI18n } from '@lingui/react'
-import { Form, Icon, Input, Button, Checkbox } from 'antd';
-import './login.less'
+import { Form, Icon, Input, Button, Checkbox, Divider } from 'antd';
+import { authenticationConstants } from '../../constants/global.constant';
 import { SessionStore } from '../../stores';
 import { login } from '../../endpoints';
+import './login.less'
+// import 'antd/dist/antd.less';
+const { AUTHENTICATED } = authenticationConstants;
 
 @withI18n()
 @Form.create()
@@ -20,48 +22,47 @@ class LoginForm extends React.Component {
   @computed get authenticationStatus() {
     return SessionStore.authenticationStatus;
   }
-  @computed get loginMessage() {
-    return SessionStore.loginMessage;
-  }
-
+  
   constructor(props) {
     super(props);
     this.sessionStore = SessionStore;
-    // observe(this, 'authenticationStatus', ({ newValue }) => {
-    //   console.log('newValue: ', newValue);
-    //   this.props.history.push(login.secondaryPath);
-    // })
+    this.sessionStore.setProperties({ loginError: {} });
+    observe(this, "authenticationStatus", ({ newValue }) => {
+      if (newValue === AUTHENTICATED){
+        this.props.history.push(login.secondaryPath)
+      };
+    })
   }
 
   handleSubmit = e => {
     this.setSubmit(true);
     e.preventDefault();
     const { login, authenticationStatus } = this.sessionStore;
-    const { validateFieldsAndScroll } = this.props.form;
-    setTimeout(() => {
-      validateFieldsAndScroll((err, values) => {
-        if (!err) {
-          console.log('Received values of form: ', values);
-          login(values);
-        }
-      });
-      return this.setSubmit(false)
-    }, 2000)
+    const { form: { validateFieldsAndScroll }, history } = this.props;
+    validateFieldsAndScroll((err, values) => {
+      if (!err) {
+        setTimeout(() => {
+          login(values)
+          this.setSubmit(false);
+        }, 1000)
+      }
+    });
   };
 
   render() {
     const { i18n, form: { getFieldDecorator } } = this.props;
-    const { submitted, loginMessage } = this;
+    const { submitted } = this;
+    const { loginError, handleChange } = this.sessionStore;
     return (
       <Form
-      className="login-form"
+        className="login-form"
       >
-        {loginMessage && <div className={loginMessage.status}><Trans>{loginMessage.message}</Trans></div>}
         <Form.Item>
           {getFieldDecorator('email', {
             rules: [{ required: true, message: i18n.t`Please input your email!` }],
           })(
             <Input
+              handleChange={handleChange}
               prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
               placeholder={i18n.t`Email`}
             />,
@@ -72,6 +73,7 @@ class LoginForm extends React.Component {
             rules: [{ required: true, message: i18n.t`Please input your Password!` }],
           })(
             <Input
+              handleChange={handleChange}
               prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="password"
               placeholder={i18n.t`Password`}
@@ -95,7 +97,14 @@ class LoginForm extends React.Component {
           >
             Log in
           </Button>
+          <Divider>OR</Divider>
+          <div className="login-row">
+            <Button type="link"><i className="fab fa-2x fa-facebook-square"></i></Button>
+            <Button type="link"><i className="fab fa-2x fa-github"></i></Button>
+            <Button type="link"><i className="fab fa-2x fa-twitter"></i></Button>
+          </div>
           <Trans>Or <Link to="/user/register">register now!</Link></Trans>
+          <div className={loginError.type}><Trans>{loginError.message}</Trans></div>
         </Form.Item>
       </Form>
     );

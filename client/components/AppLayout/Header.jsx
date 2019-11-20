@@ -2,12 +2,12 @@ import React, { Fragment, Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { Link } from 'react-router-dom';
 import { Trans, withI18n } from '@lingui/react'
-import { Layout, Menu, Breadcrumb, Icon, Avatar, Badge, Dropdown, Tooltip, Divider, Button } from 'antd';
-import 'antd/dist/antd.less';
-import classnames from 'classnames'
-import renderEmpty from 'antd/lib/config-provider/renderEmpty';
+import { Layout, Menu, Breadcrumb, Icon, Avatar, Badge, Dropdown, Tooltip, Divider, Button, Spin } from 'antd';
 import { languageDefinition, logoPath } from '../../config';
+import Search from './Search';
+import classnames from 'classnames'
 const { SubMenu } = Menu;
+import 'antd/dist/antd.less';
 import './header.less'
 
 @inject(stores => stores)
@@ -30,16 +30,16 @@ export default class Header extends Component {
 
     render() {
         const { money, moneys, language, languages, theme } = this.props.globalStore;
-        const { authenticationStatus } = this.props.sessionStore;
-        const { email, firstName, avatar } = this.props.userStore;
-
+        const { authenticationStatus, user } = this.props.sessionStore;
         const leftContent = [
             <div>
                 <Link to="/"><img className="logo" src={logoPath}/></Link>
                 <Divider type="vertical" className="divider"/>
             </div>
         ]
-        const rightContent = authenticationStatus !== 'UNAUTHENTICATED' ? 
+        const rightContent = authenticationStatus === undefined ? [
+            <Spin></Spin>
+        ] : (authenticationStatus !== 'UNAUTHENTICATED' ? 
         [
             <Menu key="user" mode="horizontal" onClick={this.handleLogout}>
                 <SubMenu
@@ -48,8 +48,8 @@ export default class Header extends Component {
                         <span style={{ color: '#999', marginRight: 4 }}>
                         <Trans>Hi,</Trans>
                         </span>
-                        <span>{firstName}</span>
-                    <Avatar style={{ marginLeft: 8 }} src={avatar} />
+                        <span>{user.firstName}</span>
+                    <Avatar style={{ marginLeft: 8 }} src={user.avatar || ''} />
                   </Fragment>
                 }
                 >
@@ -60,31 +60,24 @@ export default class Header extends Component {
             </Menu>
         ] : 
         [
-            <Menu key="anonymos" mode="horizontal">
+            <Menu key="anonymous" mode="horizontal">
                 <Menu.Item>
                     <Tooltip
                         placement="bottom"
                         label={<Trans>Login</Trans>}
                     >
-                        <Link to="/user/login"><Icon type="user-add" /></Link>
+                        <Link to="/user/login"><i className="fas fa-lg fa-user"></i></Link>
                     </Tooltip>
                 </Menu.Item>
             </Menu>
-        ]
-            
-        const currentLanguage = languages.find(
-            item => item.languageKey === language
-        )
-        rightContent.unshift(
+        ])
+
+        const menuLanguageDropdown = (
             <Menu
-            key="language"
-            selectedKeys={[currentLanguage.languageKey]}
-            onClick={data => {
-                this.handleChange({ key: 'language', value: data.key }) 
-            }}
-            mode="horizontal"
+                onClick={data => {
+                    this.handleChange({ key: 'language', value: data.key }) 
+                }}
             >
-                <SubMenu title={<Avatar size="small" src={currentLanguage.flag} />}>
                 {languages.map(item => (
                     <Menu.Item key={item.languageKey}>
                         <Avatar
@@ -95,30 +88,41 @@ export default class Header extends Component {
                         {item.title}
                     </Menu.Item>
                 ))}
-                </SubMenu>
             </Menu>
         )
         
-        const menuDropdown = (
+        const menuMoneyDropdown = (
             <Menu
-            onClick={data => {
-                this.handleChange({ key: 'money', value: data.key }) 
-            }}
-            mode="horizontal"
+                onClick={data => { this.handleChange({ key: 'money', value: data.key })}} mode="horizontal"
             >
                 {
                     moneys.map(item => (
                         <Menu.Item key={item}>
-                        {item}
+                        {item.toUpperCase()}
                         </Menu.Item>
                     ))
                 }
-            </Menu>
+            </Menu> 
         )
+
+        const currentLanguage = languages.find(
+            item => item.languageKey === language
+        )
+
         rightContent.unshift(
-            <Dropdown overlay={menuDropdown} placement="bottomLeft">
-                <Button>{money}</Button>
-            </Dropdown>
+            <Fragment>
+                <Search />
+                <Dropdown overlay={menuMoneyDropdown} placement="bottomLeft">
+                    <Button>{money.toUpperCase()}</Button>
+                </Dropdown>
+                <Dropdown overlay={menuLanguageDropdown} placement="bottomLeft">
+                    <Avatar
+                        // size="small"
+                        style={{ marginRight: 8, marginLeft: 20 }}
+                        src={currentLanguage.flag}
+                    />
+                </Dropdown>
+            </Fragment>
         )
         return (
             <Layout.Header className="header" id="layoutHeader" >

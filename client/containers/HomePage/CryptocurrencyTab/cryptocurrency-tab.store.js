@@ -11,7 +11,6 @@ class CryptocurrencyTabStore {
         this.getCryptocurrencyData = getCryptocurrencyData;
         this.initData(this.query);
         observe(this, 'query', ({ newValue }) => {
-        console.log('newValue: ', newValue);
             this.initData(newValue);
         })
     }
